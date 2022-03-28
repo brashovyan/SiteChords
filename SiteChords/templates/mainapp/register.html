@@ -1,0 +1,46 @@
+{% extends 'mainapp/base.html' %}
+{% block title %}Регистрация{% endblock %}
+{%block site_content %}
+
+<style>
+.form-group input{width:535px;height: 40px;border-radius:5px;}
+
+h6 {
+   text-indent:0px;
+   font-family: Verdana;
+   font-size: 14px;
+   color: #000000;
+   }
+</style>
+
+<div class="col-md-10 mx-auto col-lg-5">
+        <form class="p-4 p-md-5 border rounded-3 bg-light" method="POST">
+
+            {% csrf_token %}
+            <h3 align="center">Регистрация</h3>
+          <div class="form-group">
+            {{ form.username.label }}{{ form.username }}
+          </div>
+            <h6>Подсказка: логин не может содержать в себе пробелы.</h6>
+            <br>
+          <div class="form-group">
+            {{ form.email.label }}{{ form.email }}
+          </div>
+            <br>
+            <div class="form-group">
+            {{ form.password1.label }}{{ form.password1 }}
+          </div>
+            <h6>Подсказка: пароль должен состоять из строчных и прописных букв, содержать в себе цифры и специальные знаки (!@#$%^&*).</h6>
+            <br>
+            <div class="form-group">
+            {{ form.password2.label }}{{ form.password2 }}
+          </div>
+            <br>
+            <h6><a href="/login">Есть аккаунт?</a></h6>
+            <br>
+          <button class="w-100 btn btn-lg btn-primary" type="submit">Зарегистрироваться</button>
+          <hr class="my-4">
+          <small style="color:#FF0000">{{ error }}</small>
+        </form>
+      </div>
+{% endblock %}

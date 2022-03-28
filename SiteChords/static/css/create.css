@@ -1,0 +1,30 @@
+table {
+   text-indent:10px;
+   font-family: Arial;
+   color: #000000;
+   }
+
+button {
+    border-radius: 10px;
+    color: #000000;
+    display:block;
+    width:100px;
+    text-align: center;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 14px;
+    padding: 8px 16px;
+    margin: 20px auto;
+   }
+
+h6 {
+   text-indent:10px;
+   font-family: Verdana;
+   font-size: 15px;
+   color: #FF0000;
+   }
+
+h3 {
+   text-indent:10px;
+   }
+
+.form-group input{width:500px;height: 40px;border-radius:5px;}

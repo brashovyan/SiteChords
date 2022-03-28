@@ -1,0 +1,30 @@
+{% extends 'mainapp/base.html' %}
+{% block title %}Профиль {{ user.username }}{% endblock %}
+{%block site_content %}
+{% load static %}
+
+<link href= '{% static "css/create.css" %}' rel="stylesheet">
+
+<form method="post">
+    <h3>Профиль: {{user.username}}</h3>
+    <br>
+    {% csrf_token %}
+    <div class="form-group">
+        <table>
+            {{ form }}
+        </table>
+    </div>
+    <h6 style="color:#000000">Подсказка: пароль должен состоять из строчных и прописных букв, содержать в себе цифры и специальные знаки (!@#$%^&*).</h6>
+    <br>
+    <div class="col-md-10 mx-auto col-lg-1">
+        <button class="w-100 btn btn-lg btn-primary" type="submit">Изменить</button>
+        <ul class="nav nav-pills">
+            <li class="nav-item"><a href="/" class="nav-link active" aria-current="page">Назад</a></li>
+        </ul>
+    </div>
+
+    {{ message }}
+    {{ error }}
+</form>
+
+{% endblock %}

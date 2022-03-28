@@ -1,0 +1,24 @@
+h1 {
+   text-indent:10px;
+   font-family: Verdana;
+   color: #151130;
+   }
+
+h3 {
+   text-indent:10px;
+   font-family: Trebuchet MS;
+   color: #151130;
+   }
+
+h6 {
+   text-indent:10px;
+   font-family: Verdana;
+   color: #000000;
+   }
+
+.block-left{width:70%;height:800px;overflow:auto;float:left;}
+.block-right{width:30%;height:800px;overflow:auto;}
+
+img {
+    width: 100px;
+   }

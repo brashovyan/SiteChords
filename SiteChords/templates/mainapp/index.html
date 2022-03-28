@@ -1,0 +1,92 @@
+{% extends 'mainapp/base.html' %}
+{% block title %}АртемидАккорды{% endblock %}
+{%block site_content %}
+{% load static %}
+<link href= '{% static "css/index.css" %}' rel="stylesheet" >
+
+<table>
+    {% if result == null and user_songs == null %}
+        <tr><th>Исполнитель</th><th>Альбом</th><th>Песня</th><th>Создатель</th><th></th></tr>
+        {% for song in page_obj %}
+        <tr>
+            <td>{{ song.song.album.singer }}</td>
+            <td>{{ song.song.album }}</td>
+            <td>{{ song.song }}</td>
+            <td>{{ song.creator }}</td>
+            <td><a href="/content/{{song.id}}">Просмотр</a></td>
+            {% if moder == True  or song.creator == user %}
+                <td><a href="/change/{{song.id}}">Изменить</a></td>
+            {% endif %}
+        </tr>
+        {% endfor %}
+    {% endif %}
+</table>
+
+<nav class="list-pages">
+    <ul>
+        <div class="d-flex justify-content-center">
+
+        {%if page_obj.has_previous %}
+
+            <h5><a href="?page={{ page_obj.previous_page_number }}">&lt</a></h5>
+
+        {% endif %}
+
+        {% for p in page_obj.paginator.page_range %}
+            {% if page_obj.number == p %}
+                <h5>{{ p }} из {{ page_obj.paginator.num_pages }}</h5>
+            {% elif p >= page_obj.number|add:-2 and p <= page_obj.number|add:2 %}
+
+                <h5><a href="?page={{ p }}">{{ p }}</a></h5>
+
+            {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+
+            <h5><a href="?page={{ page_obj.next_page_number }}">&gt</a></h5>
+
+        {% endif %}
+        </div>
+    </ul>
+</nav>
+
+<table>
+    {% if result != null %}
+        <tr><th>Исполнитель</th><th>Альбом</th><th>Песня</th><th>Создатель</th><th></th></tr>
+
+        {% for r in result %}
+        <tr>
+            <td>{{ r.song.album.singer }}</td>
+            <td>{{ r.song.album }}</td>
+            <td>{{ r.song }}</td>
+            <td>{{ r.creator }}</td>
+            <td><a href="/content/{{r.id}}">Просмотр</a></td>
+            {% if moder == True or r.creator == user%}
+                <td><a href="/change/{{r.id}}">Изменить</a></td>
+            {% endif %}
+        </tr>
+        {% endfor %}
+    {% endif %}
+</table>
+
+<table>
+    {% if user_songs != null %}
+        <tr><th>Исполнитель</th><th>Альбом</th><th>Песня</th><th>Создатель</th><th></th></tr>
+
+        {% for user_song in user_songs %}
+        <tr>
+            <td>{{ user_song.song.album.singer }}</td>
+            <td>{{ user_song.song.album }}</td>
+            <td>{{ user_song.song }}</td>
+            <td>{{ user_song.creator }}</td>
+            <td><a href="/content/{{user_song.id}}">Просмотр</a></td>
+
+            <td><a href="/change/{{user_song.id}}">Изменить</a></td>
+
+        </tr>
+        {% endfor %}
+    {% endif %}
+</table>
+
+{% endblock %}

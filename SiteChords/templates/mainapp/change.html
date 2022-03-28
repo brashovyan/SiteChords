@@ -1,0 +1,31 @@
+{% extends 'mainapp/base.html' %}
+{% block title %}Добавление песни{% endblock %}
+{%block site_content %}
+{% load static %}
+
+<link href= '{% static "css/create.css" %}' rel="stylesheet" >
+
+<div class="form-group">
+    <form method="post">
+
+            {% csrf_token %}
+            <table>
+                {{ form }}
+            </table>
+
+        <br>
+        <div class="mx-auto col-lg-1">
+            <button class="w-100 btn btn-lg btn-primary" type="submit">Изменить</button>
+            <ul class="nav nav-pills">
+                <li class="nav-item"><a href="/" class="nav-link active" aria-current="page">Отмена</a></li>
+            </ul>
+            <br>
+            <ul class="nav nav-pills">
+                <li class="nav-item"><a href="/delete/{{song.id}}" class="nav-link active" aria-current="page">Удалить</a></li>
+            </ul>
+
+        </div>
+        <h6>{{ error }}</h6>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends 'mainapp/base.html' %}
+{% block title %}Авторизация{% endblock %}
+{%block site_content %}
+
+<div class="col-md-10 mx-auto col-lg-5">
+        <form class="p-4 p-md-5 border rounded-3 bg-light" method="POST">
+            {% csrf_token %}
+            <h3 align="center">Авторизация</h3>
+            <br>
+          <div class="form-floating mb-3">
+            <input type="Text" name="username" class="form-control" id="floatingInput" placeholder="name@example.com">
+            <label for="floatingInput">Логин</label>
+          </div>
+          <div class="form-floating mb-3">
+            <input type="password" name="password" class="form-control" id="floatingPassword" placeholder="Password">
+            <label for="floatingPassword">Пароль</label>
+          </div>
+            <h6><a href="/register">Нет аккаунта?</a></h6>
+          <button class="w-100 btn btn-lg btn-primary" type="submit">Войти</button>
+          <hr class="my-4">
+          <small style="color:#FF0000">{{ error }}</small>
+        </form>
+      </div>
+{% endblock %}

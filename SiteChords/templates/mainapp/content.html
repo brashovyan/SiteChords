@@ -1,0 +1,22 @@
+{% extends 'mainapp/base.html' %}
+{% block title %}{{ song.song }}{% endblock %}
+{%block site_content %}
+{% load static %}
+<link href= '{% static "css/content.css" %}' rel="stylesheet" >
+
+<div class="block-left">
+    <h1>{{ song.song.album.singer }} - {{ song.song }}</h1>
+    <h3>Создатель: {{ song.creator }}</h3>
+    <br>
+    {% for line in lines %}
+                    <h6>{{ line|safe|linebreaks}}</h6>
+    {% endfor %}
+</div>
+
+<div class="block-right">
+    <h4 style='text-indent:10px;'>Аккорды из песни:</h4>
+    {% for chord in chords %}
+    <img src="{{ chord.content }}">
+    {% endfor %}
+</div>
+{% endblock %}
