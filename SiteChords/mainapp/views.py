@@ -9,90 +9,19 @@ from django.core.paginator import Paginator
 
 
 def index(request):
-    url = True
-    if request.method == "POST":
-        flag_moder = False
-
-        result = []
-        ser = request.POST.get('search')
-        ser = ser.strip()
-        ser = ser.title()
-        song_db = Song.objects.all()
-        singer_db = Singer.objects.all()
-        album_db = Album.objects.all()
-
-        for song2 in song_db:
-            if ser in song2.title:
-                for cr in ContentWithChords.objects.filter(song=song2):
-                    if cr not in result:
-                        result.append(cr)
-
-        if not result:
-            for album2 in album_db:
-                if ser in album2.title:
-                    song_album = Song.objects.filter(album=album2)
-                    for song3 in song_album:
-                        for cr2 in ContentWithChords.objects.filter(song=song3):
-                            if cr2 not in result:
-                                result.append(cr2)
-
-        if not result:
-            for singer2 in singer_db:
-                if ser in singer2.name:
-                    singer_album = Album.objects.filter(singer=singer2)
-                    for album3 in singer_album:
-                        album_song = Song.objects.filter(album=album3)
-                        for song4 in album_song:
-                            for cr2 in ContentWithChords.objects.filter(song=song4):
-                                if cr2 not in result:
-                                    result.append(cr2)
-
-        if not result:
-            ser = ser.split(' ')
-
-            for ser2 in reversed(ser):
-                for song2 in song_db:
-                    if ser2 in song2.title:
-                        for cr in ContentWithChords.objects.filter(song=song2):
-                            if cr not in result:
-                                result.append(cr)
-
-                for album2 in album_db:
-                    if ser2 in album2.title:
-                        song_album = Song.objects.filter(album=album2)
-                        for song3 in song_album:
-                            for cr2 in ContentWithChords.objects.filter(song=song3):
-                                if cr2 not in result:
-                                    result.append(cr2)
-
-                for singer2 in singer_db:
-                    if ser2 in singer2.name:
-                        singer_album = Album.objects.filter(singer=singer2)
-                        for album3 in singer_album:
-                            album_song = Song.objects.filter(album=album3)
-                            for song4 in album_song:
-                                for cr2 in ContentWithChords.objects.filter(song=song4):
-                                    if cr2 not in result:
-                                        result.append(cr2)
-
-        if User.objects.filter(pk=request.user.id, groups__name='Moderator').exists():
-            flag_moder = True
-        return render(request, 'mainapp/index.html', {"moder": flag_moder, 'result': result, 'url':url})
-
-    else:
-        flag_moder = False
-        #songs = ContentWithChords.objects.all() #от старых к новым
-        songs = ContentWithChords.objects.all().order_by('-id') #от новых к старым
-        paginator = Paginator(songs, 10) #мы говорим пагинатору: бери отсюда например по три штучки
+    flag_moder = False
+    #songs = ContentWithChords.objects.all() #от старых к новым
+    songs = ContentWithChords.objects.all().order_by('-id') #от новых к старым
+    paginator = Paginator(songs, 20) #мы говорим пагинатору: бери отсюда например по три штучки
                                          #в результате чего он как бы разбивает нашу огромную кучу песен на маленькие кучки по три
-        page_number = request.GET.get('page') #после чего получаем из url номер страницы (номера он тоже делает сам в зависимости от кол-ва кучек)
-        page_obj = paginator.get_page(page_number) #и на основе номера страницы пагинатор решает какую именно кучку песен надо показать
-        #т.е. максимально простыми словами пагинтаор за нас автоматически разбивает огромную кучу на кучки поменьше и отдельно показывает их
+    page_number = request.GET.get('page') #после чего получаем из url номер страницы (номера он тоже делает сам в зависимости от кол-ва кучек)
+    page_obj = paginator.get_page(page_number) #и на основе номера страницы пагинатор решает какую именно кучку песен надо показать
+    #т.е. максимально простыми словами пагинтаор за нас автоматически разбивает огромную кучу на кучки поменьше и отдельно показывает их
 
-        if User.objects.filter(pk=request.user.id, groups__name='Moderator').exists():
-            flag_moder = True
+    if User.objects.filter(pk=request.user.id, groups__name='Moderator').exists():
+        flag_moder = True
 
-        return render(request, 'mainapp/index.html', {"moder":flag_moder, 'page_obj': page_obj, "url":url})
+    return render(request, 'mainapp/index.html', {"moder":flag_moder, 'page_obj': page_obj})
 
 def content(request, id):
     song = ContentWithChords.objects.get(id=id)
@@ -297,13 +226,10 @@ def change(request, id):
             if request.method == "POST":
                 form = CreateForm(request.POST)
                 if form.is_valid():
-                    song10 = ContentWithChords.objects.get(id=id)
-                    singer_old = song10.song.album.singer
-                    album_old = song10.song.album
-                    song_old = song10.song
-
-
                     song_content = ContentWithChords.objects.get(id=id)
+                    singer_old = song_content.song.album.singer
+                    album_old = song_content.song.album
+                    song_old = song_content.song
                     flag_singer = False
                     flag_album = False
                     flag_song = False
@@ -373,19 +299,14 @@ def change(request, id):
                             song_content.chords.add(chord2)
 
                         #автоочистка.
-                        song_old2 = Song.objects.get(album=Album.objects.get(singer=Singer.objects.get(name=singer_old), title=album_old), title=song_old)
-                        if not ContentWithChords.objects.filter(song=song_old2): #если у песни нет ни одного контента, то удаляем её
-                            song_old2.delete()
-                            #print(f'Удалить песню {song_old2.title}')
+                        if not ContentWithChords.objects.filter(song=song_old):  # если у песни нет ни одного контента, то удаляем её
+                            song_old.delete()
 
-                            album_old2 = Album.objects.get(singer=Singer.objects.get(name=singer_old), title=album_old)
-                            if not Song.objects.filter(album=album_old2): #далее если в альбоме нет ни одной песни, удаляем его
-                                album_old2.delete()
-                                #print(f'Удалить альбом {album_old2.title}')
+                            if not Song.objects.filter(album=album_old):  # далее если в альбоме нет ни одной песни, удаляем его
+                                album_old.delete()
 
-                                singer_old2 = Album.objects.filter(singer=Singer.objects.get(name=singer_old)) #
-                                if not singer_old2: #если у исполнителя нет ни одного альбома, удаляем его
-                                    Singer.objects.get(name=singer_old).delete()
+                                if not Album.objects.filter(singer=singer_old):  # если у исполнителя нет ни одного альбома, удаляем его
+                                    singer_old.delete()
 
                         return HttpResponseRedirect("/")
 
@@ -414,14 +335,30 @@ def change(request, id):
 
 
 def delete(request, id):
-    if User.objects.filter(pk=request.user.id, groups__name='Moderator').exists():
-        song = ContentWithChords.objects.get(id=id)
-        if request.method == "POST":
-            song.delete()
+    if request.user.is_authenticated:
+        if User.objects.filter(pk=request.user.id, groups__name='Moderator').exists() or ContentWithChords.objects.filter(id=id, creator=request.user).exists():
+            cwc = ContentWithChords.objects.get(id=id)
+            if request.method == "POST":
+                singer_old = cwc.song.album.singer
+                album_old = cwc.song.album
+                song_old = cwc.song
+                cwc.delete()
 
-            return HttpResponseRedirect("/")
+                # автоочистка.
+                if not ContentWithChords.objects.filter(song=song_old):  # если у песни нет ни одного контента, то удаляем её
+                    song_old.delete()
+
+                    if not Song.objects.filter(album=album_old):  # далее если в альбоме нет ни одной песни, удаляем его
+                        album_old.delete()
+
+                        if not Album.objects.filter(singer=singer_old):  # если у исполнителя нет ни одного альбома, удаляем его
+                            singer_old.delete()
+
+                return HttpResponseRedirect("/")
+            else:
+                return render(request, 'mainapp/delete.html', {'song': cwc})
         else:
-            return render(request, 'mainapp/delete.html', {'song': song})
+            return HttpResponseRedirect("/")
     else:
         return HttpResponseRedirect("/")
 
@@ -473,3 +410,75 @@ def my_songs(request, id):
             return HttpResponseRedirect("/")
     else:
         return HttpResponseRedirect("/")
+
+
+def search(request):
+    ser = request.GET.get('search_str')
+    flag_moder = False
+
+    result = []
+
+    ser = ser.strip()
+    ser = ser.title()
+    song_db = Song.objects.all()
+    singer_db = Singer.objects.all()
+    album_db = Album.objects.all()
+
+    for song2 in song_db:
+        if ser in song2.title:
+            for cr in ContentWithChords.objects.filter(song=song2):
+                if cr not in result:
+                    result.append(cr)
+
+    if not result:
+        for album2 in album_db:
+            if ser in album2.title:
+                song_album = Song.objects.filter(album=album2)
+                for song3 in song_album:
+                    for cr2 in ContentWithChords.objects.filter(song=song3):
+                        if cr2 not in result:
+                            result.append(cr2)
+
+    if not result:
+        for singer2 in singer_db:
+            if ser in singer2.name:
+                singer_album = Album.objects.filter(singer=singer2)
+                for album3 in singer_album:
+                    album_song = Song.objects.filter(album=album3)
+                    for song4 in album_song:
+                        for cr2 in ContentWithChords.objects.filter(song=song4):
+                            if cr2 not in result:
+                                result.append(cr2)
+
+    if not result:
+        ser = ser.split(' ')
+
+        for ser2 in reversed(ser):
+            for song2 in song_db:
+                if ser2 in song2.title:
+                    for cr in ContentWithChords.objects.filter(song=song2):
+                        if cr not in result:
+                            result.append(cr)
+
+            for album2 in album_db:
+                if ser2 in album2.title:
+                    song_album = Song.objects.filter(album=album2)
+                    for song3 in song_album:
+                        for cr2 in ContentWithChords.objects.filter(song=song3):
+                            if cr2 not in result:
+                                result.append(cr2)
+
+            for singer2 in singer_db:
+                if ser2 in singer2.name:
+                    singer_album = Album.objects.filter(singer=singer2)
+                    for album3 in singer_album:
+                        album_song = Song.objects.filter(album=album3)
+                        for song4 in album_song:
+                            for cr2 in ContentWithChords.objects.filter(song=song4):
+                                if cr2 not in result:
+                                    result.append(cr2)
+
+    if User.objects.filter(pk=request.user.id, groups__name='Moderator').exists():
+        flag_moder = True
+    return render(request, 'mainapp/index.html', {"moder": flag_moder, 'result': result})
+

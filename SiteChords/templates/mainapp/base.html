@@ -16,22 +16,18 @@ input {
         <img style="width: 35px;" src="{% static 'image/logo.svg' %}">
           &nbsp;
         <span class="fs-4">АртемидАккорды</span>
-
       </a>
-        {% if url == True %}
-        <form method="POST">
-            {% csrf_token %}
+
+        <form action="{% url 'search' %}" method="get">
             {% if user.is_authenticated %}
             <ul class="nav nav-pills">
                 <li class="nav-item"><a href="/my/{{user.id}}" class="nav-link">Мои песни</a></li>
-                <input type="search" placeholder="Поиск..." aria-label="Search" name="search">
+                <input name="search_str" type="text" placeholder="Поиск...">
             </ul>
             {% else %}
-                <input type="search" placeholder="Поиск..." aria-label="Search" name="search">
+                <input name="search_str" type="text" placeholder="Поиск...">
             {% endif %}
-
         </form>
-        {% endif %}
 
       <ul class="nav nav-pills">
           {% if user.is_authenticated %}

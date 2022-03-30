@@ -31,4 +31,6 @@ urlpatterns = [
     path('delete/<int:id>/', views.delete, name='delete'),
     path('profile/<int:id>/', views.profile, name='profile'),
     path('my/<int:id>/', views.my_songs, name='my_songs'),
+    path('search/', views.search, name='search'),
+    path('search/<str:search_str>/', views.search),
 ]

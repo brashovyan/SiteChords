@@ -16,7 +16,11 @@
 <div class="block-right">
     <h4 style='text-indent:10px;'>Аккорды из песни:</h4>
     {% for chord in chords %}
-    <img src="{{ chord.content }}">
+        {% if 'http' in chord.content %}
+            <img src="{{ chord.content }}">
+        {% else %}
+            <img src="{% static chord.content %}">
+        {% endif %}
     {% endfor %}
 </div>
 {% endblock %}

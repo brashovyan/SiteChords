@@ -20,5 +20,6 @@ h6 {
 .block-right{width:30%;height:800px;overflow:auto;}
 
 img {
+    height: 100px;
     width: 100px;
    }
