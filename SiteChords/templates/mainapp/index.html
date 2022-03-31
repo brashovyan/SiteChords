@@ -5,7 +5,7 @@
 <link href= '{% static "css/index.css" %}' rel="stylesheet" >
 
 <table>
-    {% if result == null and user_songs == null %}
+    {% if result == null and user_songs == null and user_favourites == null %}
         <tr><th>Исполнитель</th><th>Альбом</th><th>Песня</th><th>Создатель</th><th></th></tr>
         {% for song in page_obj %}
         <tr>
@@ -83,6 +83,26 @@
             <td><a href="/content/{{user_song.id}}">Просмотр</a></td>
 
             <td><a href="/change/{{user_song.id}}">Изменить</a></td>
+
+        </tr>
+        {% endfor %}
+    {% endif %}
+</table>
+
+<table>
+    {% if user_favourites != null %}
+        <tr><th>Исполнитель</th><th>Альбом</th><th>Песня</th><th>Создатель</th><th></th></tr>
+
+        {% for favourite in user_favourites %}
+        <tr>
+            <td>{{ favourite.song.song.album.singer }}</td>
+            <td>{{ favourite.song.song.album }}</td>
+            <td>{{ favourite.song.song }}</td>
+            <td>{{ favourite.song.creator }}</td>
+            <td><a href="/content/{{favourite.song.id}}">Просмотр</a></td>
+            {% if moder == True  or favourite.song.creator == user %}
+                <td><a href="/change/{{favourite.song.id}}">Изменить</a></td>
+            {% endif %}
 
         </tr>
         {% endfor %}

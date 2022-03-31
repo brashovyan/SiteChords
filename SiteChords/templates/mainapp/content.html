@@ -7,7 +7,16 @@
 <div class="block-left">
     <h1>{{ song.song.album.singer }} - {{ song.song }}</h1>
     <h3>Создатель: {{ song.creator }}</h3>
+    {% if user.is_authenticated %}
+        {% if flag_favourite == False %}
+        <a href="/favourites/{{song.id}}">Добавить в избранное</a>
+        {% else %}
+        <a href="/favourites/{{song.id}}">Убрать из избранного</a>
+        {% endif %}
+    {% endif %}
     <br>
+    <br>
+
     {% for line in lines %}
                     <h6>{{ line|safe|linebreaks}}</h6>
     {% endfor %}

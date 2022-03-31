@@ -33,4 +33,6 @@ urlpatterns = [
     path('my/<int:id>/', views.my_songs, name='my_songs'),
     path('search/', views.search, name='search'),
     path('search/<str:search_str>/', views.search),
+    path('favourites/<int:id>/', views.favourites, name='favourites'),
+    path('my_favourites/<int:id>/', views.my_favourites, name='my_favourites'),
 ]

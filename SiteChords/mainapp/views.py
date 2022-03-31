@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
-from .models import ContentWithChords, Singer, Album, Song, Chord, ChordVariation
+from .models import ContentWithChords, Singer, Album, Song, Chord, ChordVariation, Favourites
 from .forms import CreateForm, RegForm, Change_profile
 from django.contrib.auth.models import User, Group
 from django.contrib.auth import authenticate, login, logout
@@ -29,6 +29,14 @@ def content(request, id):
     lines = []
     chords = []
 
+
+    flag_favourite = False
+
+    if request.user.is_authenticated:
+        user = User.objects.get(id=request.user.id)
+        if Favourites.objects.filter(guitarist=user, song=song):
+            flag_favourite = True
+
     for chord in song.chords.all():
         for cv in ChordVariation.objects.filter(chord=chord):
             chords.append(cv)
@@ -36,7 +44,7 @@ def content(request, id):
     for line in s.split('\n'):
         line = line.replace(" ", "&nbsp;") #для тупого html заменяем все пробелы на это
         lines.append(line)
-    return render(request, 'mainapp/content.html', {"song": song, "lines": lines, 'chords':chords})
+    return render(request, 'mainapp/content.html', {"song": song, "lines": lines, 'chords':chords, 'flag_favourite':flag_favourite})
 
 
 def create(request):
@@ -403,7 +411,6 @@ def my_songs(request, id):
     if request.user.is_authenticated:
         user = User.objects.get(id=id)
         if user == request.user:
-            url = True
             user_songs = ContentWithChords.objects.filter(creator=user).order_by('-id')
             return render(request, 'mainapp/index.html', {'user_songs': user_songs})
         else:
@@ -482,3 +489,33 @@ def search(request):
         flag_moder = True
     return render(request, 'mainapp/index.html', {"moder": flag_moder, 'result': result})
 
+def favourites(request, id):
+    if request.user.is_authenticated:
+        fav = Favourites()
+        user = User.objects.get(id=request.user.id)
+        song = ContentWithChords.objects.get(id=id)
+        if not Favourites.objects.filter(guitarist=user, song=song):
+            fav.guitarist = user
+            fav.song = song
+            fav.save()
+            return HttpResponseRedirect(f"/content/{id}")
+        else:
+            Favourites.objects.get(guitarist=user, song=song).delete()
+            return HttpResponseRedirect(f"/content/{id}")
+    else:
+        return HttpResponseRedirect("/")
+
+
+def my_favourites(request, id):
+    if request.user.is_authenticated:
+        user = User.objects.get(id=id)
+        flag_moder = False
+        if user == request.user:
+            if User.objects.filter(pk=request.user.id, groups__name='Moderator').exists():
+                flag_moder = True
+            user_favourites = Favourites.objects.filter(guitarist=user).order_by('-id')
+            return render(request, 'mainapp/index.html', {'user_favourites': user_favourites, 'moder':flag_moder})
+        else:
+            return HttpResponseRedirect("/")
+    else:
+        return HttpResponseRedirect("/")

@@ -41,8 +41,8 @@ class ContentWithChords(models.Model):
     def __str__(self):
         return '%s: %s' % (self.song, self.creator)
 
-    def get_absolute_url(self):
-        return reverse('content', args[str(self.id)])
+    """def get_absolute_url(self):
+        return reverse('content', args[str(self.id)])"""
 
 
 class Chord(models.Model):
@@ -61,4 +61,8 @@ class ChordVariation(models.Model):
     def __str__(self):
         return '%s' % (self.chord)
 
+
+class Favourites(models.Model):
+    guitarist = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Пользователь', null=False)
+    song = models.ForeignKey(ContentWithChords, on_delete=models.CASCADE, verbose_name='Песня', null=False)
 
