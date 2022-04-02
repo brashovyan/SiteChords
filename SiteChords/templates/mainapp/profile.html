@@ -1,12 +1,12 @@
 {% extends 'mainapp/base.html' %}
-{% block title %}Профиль {{ user.username }}{% endblock %}
+{% block title %}Профиль {{ name }}{% endblock %}
 {%block site_content %}
 {% load static %}
 
 <link href= '{% static "css/create.css" %}' rel="stylesheet">
 
 <form method="post">
-    <h3>Профиль: {{user.username}}</h3>
+    <h3>Профиль: {{name}}</h3>
     <br>
     {% csrf_token %}
     <div class="form-group">

@@ -7,7 +7,6 @@ from django.contrib.auth import authenticate, login, logout
 from django.core.paginator import Paginator
 
 
-
 def index(request):
     flag_moder = False
     #songs = ContentWithChords.objects.all() #от старых к новым
@@ -18,10 +17,11 @@ def index(request):
     page_obj = paginator.get_page(page_number) #и на основе номера страницы пагинатор решает какую именно кучку песен надо показать
     #т.е. максимально простыми словами пагинтаор за нас автоматически разбивает огромную кучу на кучки поменьше и отдельно показывает их
 
-    if User.objects.filter(pk=request.user.id, groups__name='Moderator').exists():
+    if User.objects.filter(pk=request.user.id, groups__name='Moderator').exists() or User.objects.filter(pk=request.user.id, groups__name='Admin').exists():
         flag_moder = True
 
     return render(request, 'mainapp/index.html', {"moder":flag_moder, 'page_obj': page_obj})
+
 
 def content(request, id):
     song = ContentWithChords.objects.get(id=id)
@@ -230,7 +230,7 @@ def about(request):
 
 def change(request, id):
     if request.user.is_authenticated:
-        if User.objects.filter(pk=request.user.id, groups__name='Moderator').exists() or ContentWithChords.objects.filter(id=id, creator=request.user).exists():
+        if User.objects.filter(pk=request.user.id, groups__name='Moderator').exists() or ContentWithChords.objects.filter(id=id, creator=request.user).exists() or User.objects.filter(pk=request.user.id, groups__name='Admin').exists():
             if request.method == "POST":
                 form = CreateForm(request.POST)
                 if form.is_valid():
@@ -344,7 +344,7 @@ def change(request, id):
 
 def delete(request, id):
     if request.user.is_authenticated:
-        if User.objects.filter(pk=request.user.id, groups__name='Moderator').exists() or ContentWithChords.objects.filter(id=id, creator=request.user).exists():
+        if User.objects.filter(pk=request.user.id, groups__name='Moderator').exists() or ContentWithChords.objects.filter(id=id, creator=request.user).exists() or User.objects.filter(pk=request.user.id, groups__name='Admin').exists():
             cwc = ContentWithChords.objects.get(id=id)
             if request.method == "POST":
                 singer_old = cwc.song.album.singer
@@ -373,7 +373,7 @@ def delete(request, id):
 
 def profile(request, id):
     user = User.objects.get(id=id)
-    if user == request.user:
+    if user == request.user or User.objects.filter(pk=request.user.id, groups__name='Admin').exists():
         if request.method == 'POST':
             form = Change_profile(request.POST)
             if form.is_valid():
@@ -402,7 +402,7 @@ def profile(request, id):
                 return render(request, 'mainapp/profile.html', {'form':form, 'error':error})
         else:
             form = Change_profile(initial={'email': user.email, 'first_name': user.first_name, 'last_name': user.last_name})
-            return render(request, 'mainapp/profile.html', {'form':form})
+            return render(request, 'mainapp/profile.html', {'form':form, 'name':user.username})
     else:
         return HttpResponseRedirect("/")
 
@@ -410,7 +410,7 @@ def profile(request, id):
 def my_songs(request, id):
     if request.user.is_authenticated:
         user = User.objects.get(id=id)
-        if user == request.user:
+        if user == request.user or User.objects.filter(pk=request.user.id, groups__name='Admin').exists():
             user_songs = ContentWithChords.objects.filter(creator=user).order_by('-id')
             return render(request, 'mainapp/index.html', {'user_songs': user_songs})
         else:
@@ -485,7 +485,7 @@ def search(request):
                                 if cr2 not in result:
                                     result.append(cr2)
 
-    if User.objects.filter(pk=request.user.id, groups__name='Moderator').exists():
+    if User.objects.filter(pk=request.user.id, groups__name='Moderator').exists() or User.objects.filter(pk=request.user.id, groups__name='Admin').exists():
         flag_moder = True
     return render(request, 'mainapp/index.html', {"moder": flag_moder, 'result': result})
 
@@ -511,11 +511,85 @@ def my_favourites(request, id):
         user = User.objects.get(id=id)
         flag_moder = False
         if user == request.user:
-            if User.objects.filter(pk=request.user.id, groups__name='Moderator').exists():
+            if User.objects.filter(pk=request.user.id, groups__name='Moderator').exists() or User.objects.filter(pk=request.user.id, groups__name='Admin').exists():
                 flag_moder = True
             user_favourites = Favourites.objects.filter(guitarist=user).order_by('-id')
             return render(request, 'mainapp/index.html', {'user_favourites': user_favourites, 'moder':flag_moder})
         else:
             return HttpResponseRedirect("/")
+    else:
+        return HttpResponseRedirect("/")
+
+
+def admin(request):
+    if User.objects.filter(pk=request.user.id, groups__name='Moderator').exists() or User.objects.filter(pk=request.user.id, groups__name='Admin').exists():
+        flag_moder = True
+        if User.objects.filter(pk=request.user.id, groups__name='Admin').exists():
+            flag_admin = True
+        else:
+            flag_admin = False
+
+        return render(request, 'mainapp/admin.html', {'moder':flag_moder, 'admin':flag_admin})
+    else:
+        return HttpResponseRedirect("/")
+
+
+def admin_users(request):
+    if User.objects.filter(pk=request.user.id, groups__name='Admin').exists():
+        users = User.objects.all()
+        users_in_group = Group.objects.get(name="Moderator").user_set.all()
+        if request.method == 'POST':
+            ser = request.POST.get('search')
+            ser = ser.strip()
+            ser = ser.title()
+            result = []
+            print(ser)
+            for u in users:
+                if ser in u.username.title():
+                    result.append(u)
+
+            return render(request, 'mainapp/admin_users.html', {'ser': result, 'group_moder': users_in_group})
+
+        else:
+
+            return render(request, 'mainapp/admin_users.html', {'users':users, 'group_moder':users_in_group})
+    else:
+        return HttpResponseRedirect("/")
+
+
+def admin_users_delete(request, id):
+    if User.objects.filter(pk=request.user.id, groups__name='Admin').exists():
+        user = User.objects.get(id=id)
+        if user.id != 1: #главный админ с айдишником 1 не может быть удалён
+            user.delete()
+        return HttpResponseRedirect("/admin/users")
+    else:
+        return HttpResponseRedirect("/")
+
+
+def admin_users_deletemoder(request, id):
+    if User.objects.filter(pk=request.user.id, groups__name='Admin').exists():
+        user = User.objects.get(id=id)
+        group = Group.objects.get(name='Moderator')
+        user.groups.remove(group)
+        return HttpResponseRedirect("/admin/users")
+    else:
+        return HttpResponseRedirect("/")
+
+
+def admin_users_givemoder(request, id):
+    if User.objects.filter(pk=request.user.id, groups__name='Admin').exists():
+        user = User.objects.get(id=id)
+        group = Group.objects.get(name='Moderator')
+        user.groups.add(group)
+        return HttpResponseRedirect("/admin/users")
+    else:
+        return HttpResponseRedirect("/")
+
+
+def admin_users_moderlist(request):
+    if User.objects.filter(pk=request.user.id, groups__name='Admin').exists():
+        users_in_group = Group.objects.get(name="Moderator").user_set.all()
+        return render(request, 'mainapp/admin_users.html', {'moderators': users_in_group, 'group_moder': users_in_group})
     else:
         return HttpResponseRedirect("/")

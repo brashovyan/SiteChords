@@ -1,0 +1,60 @@
+{% extends 'mainapp/base.html' %}
+{% block title %}Добавление песни{% endblock %}
+{%block site_content %}
+<form method="POST">
+    {% csrf_token %}
+    <input name="search" type="text" placeholder="Поиск...">
+    <td><a href="/admin/users/moder_list">Список модераторов</a></td>
+    <td><a href="/admin/users">К списку пользователей</a></td>
+</form>
+    {% if ser == null and moderators == null %}
+        {% for user in users %}
+            <table>
+                <tr>
+                    <td>{{ user }}</td>
+                    <td><a href="/profile/{{user.id}}">Изменить</a></td>
+                    <td><a href="/admin/users/delete/{{user.id}}">Удалить</a></td>
+                    {% if user in group_moder %}
+                        <td><a href="/admin/users/delete_moder/{{user.id}}">Убрать модератора</a></td>
+                    {% else %}
+                        <td><a href="/admin/users/give_moder/{{user.id}}">Дать модератора</a></td>
+                    {% endif %}
+                        <td><a href="/my/{{user.id}}">Список песен</a></td>
+                </tr>
+            </table>
+        {% endfor %}
+    {% endif %}
+    {% if ser != null %}
+        {% for s in ser %}
+            <table>
+                <tr>
+                    <td>{{ s }}</td>
+                    <td><a href="/profile/{{s.id}}">Изменить</a></td>
+                    <td><a href="/admin/users/delete/{{s.id}}">Удалить</a></td>
+                    {% if s in group_moder %}
+                        <td><a href="/admin/users/delete_moder/{{s.id}}">Убрать модератора</a></td>
+                    {% else %}
+                        <td><a href="/admin/users/give_moder/{{s.id}}">Дать модератора</a></td>
+                    {% endif %}
+                        <td><a href="/my/{{s.id}}">Список песен</a></td>
+                </tr>
+            </table>
+        {% endfor %}
+    {% else %}
+        {% for moder in moderators %}
+            <table>
+                <tr>
+                    <td>{{ moder }}</td>
+                    <td><a href="/profile/{{moder.id}}">Изменить</a></td>
+                    <td><a href="/admin/users/delete/{{moder.id}}">Удалить</a></td>
+                    {% if moder in group_moder %}
+                        <td><a href="/admin/users/delete_moder/{{moder.id}}">Убрать модератора</a></td>
+                    {% else %}
+                        <td><a href="/admin/users/give_moder/{{moder.id}}">Дать модератора</a></td>
+                    {% endif %}
+                        <td><a href="/my/{{moder.id}}">Список песен</a></td>
+                </tr>
+            </table>
+        {% endfor %}
+    {% endif %}
+{% endblock %}

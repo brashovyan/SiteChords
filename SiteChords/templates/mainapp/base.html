@@ -21,6 +21,9 @@ input {
         <form action="{% url 'search' %}" method="get">
             {% if user.is_authenticated %}
             <ul class="nav nav-pills">
+                {% if moder == True %}
+                <li class="nav-item"><a href="/admin" class="nav-link">Панель Администратора</a></li>
+                {% endif %}
                 <li class="nav-item"><a href="/my_favourites/{{user.id}}" class="nav-link">Избранное</a></li>
                 <li class="nav-item"><a href="/my/{{user.id}}" class="nav-link">Мои песни</a></li>
                 <input name="search_str" type="text" placeholder="Поиск...">

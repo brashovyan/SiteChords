@@ -19,7 +19,7 @@ from django.urls import re_path
 from mainapp import views
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('admindjango/', admin.site.urls),
     path('', views.index, name='home'),
     path('content/<int:id>/', views.content, name='content'),
     path('create/', views.create, name="create"),
@@ -32,7 +32,13 @@ urlpatterns = [
     path('profile/<int:id>/', views.profile, name='profile'),
     path('my/<int:id>/', views.my_songs, name='my_songs'),
     path('search/', views.search, name='search'),
-    path('search/<str:search_str>/', views.search),
     path('favourites/<int:id>/', views.favourites, name='favourites'),
+    path('search/<str:search_str>/', views.search),
     path('my_favourites/<int:id>/', views.my_favourites, name='my_favourites'),
+    path('admin/', views.admin, name='admin'),
+    path('admin/users/', views.admin_users, name='admin_users'),
+    path('admin/users/delete/<int:id>/', views.admin_users_delete, name='admin_users_delete'),
+    path('admin/users/delete_moder/<int:id>/', views.admin_users_deletemoder, name='admin_users_deletemoder'),
+    path('admin/users/give_moder/<int:id>/', views.admin_users_givemoder, name='admin_users_givemoder'),
+    path('admin/users/moder_list', views.admin_users_moderlist, name='admin_users_moderlist'),
 ]
