@@ -1,0 +1,28 @@
+{% extends 'mainapp/base.html' %}
+{% block title %}{{song.title}}{% endblock %}
+{%block site_content %}
+<h3>Изменение песни {{song.title}}</h3>
+
+<br>
+<form method="POST">
+    {% csrf_token %}
+    <input name="title" value='{{song.title}}' type="text" placeholder="Новое название">
+
+    <select name='selected_album'>
+        <option value="{{song.album.id}}">{{song.album}}</option>
+        {% for album in albums %}
+            {% if album != song.album %}
+                <option value='{{album.id}}'>{{ album }}</option>
+            {% endif %}
+        {% endfor %}
+    </select>
+
+    <button type="submit">Изменить</button>
+    <a href="/admin/songs/delete/{{song.id}}">Удалить</a>
+    <a href="/admin/songs">Отмена</a>
+</form>
+{{error}}
+<h4>Кол-во контента:</h4>
+{{ cwc }}
+
+{%endblock%}

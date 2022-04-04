@@ -1,17 +1,20 @@
 {% extends 'mainapp/base.html' %}
-{% block title %}Добавление песни{% endblock %}
+{% block title %}Пользователи{% endblock %}
 {%block site_content %}
 <form method="POST">
     {% csrf_token %}
-    <input name="search" type="text" placeholder="Поиск...">
-    <td><a href="/admin/users/moder_list">Список модераторов</a></td>
-    <td><a href="/admin/users">К списку пользователей</a></td>
+    {% if hide_search == null %}
+        <input name="search" type="text" placeholder="Поиск...">
+        <a href="/admin/users/moder_list">Список модераторов</a>
+    {% else %}
+        <a href="/admin/users">К списку пользователей</a>
+    {% endif %}
 </form>
     {% if ser == null and moderators == null %}
         {% for user in users %}
             <table>
                 <tr>
-                    <td>{{ user }}</td>
+                    <td>{{ user.username }}</td>
                     <td><a href="/profile/{{user.id}}">Изменить</a></td>
                     <td><a href="/admin/users/delete/{{user.id}}">Удалить</a></td>
                     {% if user in group_moder %}

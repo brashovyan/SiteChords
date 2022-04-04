@@ -1,0 +1,32 @@
+{% extends 'mainapp/base.html' %}
+{% block title %}Исполнители{% endblock %}
+{%block site_content %}
+
+<form method="POST">
+    {% csrf_token %}
+    <input name="search" type="text" placeholder="Поиск...">
+    <a href="/admin/singers/create">Создать</a>
+    {% if ser != null %}
+        <a href="/admin/singers">Назад</a>
+    {% endif %}
+</form>
+
+ <table>
+     {% if ser == null %}
+         {% for singer in singers %}
+            <tr>
+                <td>{{singer.name}}</td>
+                <td><a href="/admin/singers/change/{{singer.id}}">Изменить</a></td>
+            </tr>
+         {% endfor %}
+     {% else %}
+
+     {% for s in ser %}
+            <tr>
+                <td>{{s.name}}</td>
+                <td><a href="/admin/singers/change/{{s.id}}">Изменить</a></td>
+            </tr>
+         {% endfor %}
+     {% endif %}
+ </table>
+{%endblock%}

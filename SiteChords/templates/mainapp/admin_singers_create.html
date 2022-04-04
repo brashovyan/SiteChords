@@ -1,0 +1,13 @@
+{% extends 'mainapp/base.html' %}
+{% block title %}Создание исполнителя{% endblock %}
+{%block site_content %}
+
+<form method="POST">
+    {% csrf_token %}
+    <input name="name" type="text" placeholder="Введите имя исполнителя">
+    <button type="submit">Создать</button>
+    <a href="/admin/singers">Отмена</a>
+</form>
+{{ error }}
+
+{%endblock%}

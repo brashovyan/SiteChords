@@ -8,7 +8,7 @@ from django.core.paginator import Paginator
 
 
 def index(request):
-    flag_moder = False
+
     #songs = ContentWithChords.objects.all() #от старых к новым
     songs = ContentWithChords.objects.all().order_by('-id') #от новых к старым
     paginator = Paginator(songs, 20) #мы говорим пагинатору: бери отсюда например по три штучки
@@ -17,8 +17,7 @@ def index(request):
     page_obj = paginator.get_page(page_number) #и на основе номера страницы пагинатор решает какую именно кучку песен надо показать
     #т.е. максимально простыми словами пагинтаор за нас автоматически разбивает огромную кучу на кучки поменьше и отдельно показывает их
 
-    if User.objects.filter(pk=request.user.id, groups__name='Moderator').exists() or User.objects.filter(pk=request.user.id, groups__name='Admin').exists():
-        flag_moder = True
+    flag_moder = check_moder(request)
 
     return render(request, 'mainapp/index.html', {"moder":flag_moder, 'page_obj': page_obj})
 
@@ -28,7 +27,6 @@ def content(request, id):
     s = song.content
     lines = []
     chords = []
-
 
     flag_favourite = False
 
@@ -44,7 +42,10 @@ def content(request, id):
     for line in s.split('\n'):
         line = line.replace(" ", "&nbsp;") #для тупого html заменяем все пробелы на это
         lines.append(line)
-    return render(request, 'mainapp/content.html', {"song": song, "lines": lines, 'chords':chords, 'flag_favourite':flag_favourite})
+
+    flag_moder = check_moder(request)
+
+    return render(request, 'mainapp/content.html', {"song": song, "lines": lines, 'chords':chords, 'flag_favourite':flag_favourite, 'moder':flag_moder})
 
 
 def create(request):
@@ -133,10 +134,12 @@ def create(request):
                         chord2 = Chord.objects.get(title=chord)
                         i = i + 1
                 except:
+                    flag_moder = check_moder(request)
+
                     error = "Вы неправильно ввели аккорды! Пожалуйста, введите аккорды согласно подсказке (так же возмжна ситуация," \
                             " что в нашей базе данных нет таких аккордов. В таком случае пропустите это поле," \
                             " написав любой обычный аккорд (например Am), и обратитесь к модератору)"
-                    return render(request, 'mainapp/create.html', {"form": form, 'error': error})
+                    return render(request, 'mainapp/create.html', {"form": form, 'error': error, 'moder':flag_moder})
 
                 if i == len(chords):
                     song_content.save()
@@ -147,12 +150,16 @@ def create(request):
 
                 return HttpResponseRedirect("/")
             else:
+                flag_moder = check_moder(request)
+
                 error = "Некорректно заполненная форма!"
-                return render(request, 'mainapp/create.html', {"form": form, 'error': error})
+                return render(request, 'mainapp/create.html', {"form": form, 'error': error, 'moder':flag_moder})
 
         else:
+            flag_moder = check_moder(request)
+
             form = CreateForm()
-            return render(request, 'mainapp/create.html', {"form": form})
+            return render(request, 'mainapp/create.html', {"form": form, 'moder':flag_moder})
     else:
         return HttpResponseRedirect("/login")
 
@@ -225,7 +232,9 @@ def logout1(request):
 
 
 def about(request):
-    return render(request, 'mainapp/about.html',)
+    flag_moder = check_moder(request)
+
+    return render(request, 'mainapp/about.html', {'moder':flag_moder})
 
 
 def change(request, id):
@@ -295,8 +304,10 @@ def change(request, id):
                             chord2 = Chord.objects.get(title=chord)
                             i = i + 1
                     except:
+                        flag_moder = check_moder(request)
+
                         error = "Вы неправильно ввели аккорды! Или, возможно, каких то аккордов нет в базе данных."
-                        return render(request, 'mainapp/change.html', {"form": form, 'error': error})
+                        return render(request, 'mainapp/change.html', {"form": form, 'error': error, 'moder':flag_moder})
 
                     if i == len(chords):
                         song_content.chords.clear()
@@ -319,13 +330,20 @@ def change(request, id):
                         return HttpResponseRedirect("/")
 
                     else:
+                        flag_moder = check_moder(request)
+
                         error = "Некорректно заполненная форма!"
-                        return render(request, 'mainapp/change.html', {"form": form, 'error': error})
+                        return render(request, 'mainapp/change.html', {"form": form, 'error': error, 'moder':flag_moder})
                 else:
+                    flag_moder = check_moder(request)
+
                     error = "Некорректно заполненная форма!"
-                    return render(request, 'mainapp/change.html', {"form": form, 'error': error})
+                    return render(request, 'mainapp/change.html', {"form": form, 'error': error, 'moder':flag_moder})
 
             else:
+
+                flag_moder = check_moder(request)
+
                 song = ContentWithChords.objects.get(id=id)
                 s = ""
 
@@ -335,7 +353,7 @@ def change(request, id):
 
                 form = CreateForm(initial={'singer': song.song.album.singer, 'album':song.song.album, 'song':song.song, 'content':song.content, 'chords':s})
 
-                return render(request, 'mainapp/change.html', {"form": form, 'song': song})
+                return render(request, 'mainapp/change.html', {"form": form, 'song': song, 'moder':flag_moder})
         else:
             return HttpResponseRedirect("/")
     else:
@@ -364,7 +382,9 @@ def delete(request, id):
 
                 return HttpResponseRedirect("/")
             else:
-                return render(request, 'mainapp/delete.html', {'song': cwc})
+                flag_moder = check_moder(request)
+
+                return render(request, 'mainapp/delete.html', {'song': cwc, 'moder':flag_moder})
         else:
             return HttpResponseRedirect("/")
     else:
@@ -385,34 +405,43 @@ def profile(request, id):
                 user.last_name = last_name
                 password1 = request.POST.get('password1')
                 password2 = request.POST.get('password2')
+
+                flag_moder = check_moder(request)
+
                 if password1 != "" and password2 != "":
                     if password1 == password2:
                         user.set_password(password1)
                         user.save()
                     else:
                         error = 'Пароли не совпадают!'
-                        return render(request, 'mainapp/profile.html', {'form': form, 'error': error})
+                        return render(request, 'mainapp/profile.html', {'form': form, 'error': error, 'moder':flag_moder})
                 else:
                     user.save()
 
                 message = 'Изменения успешно сохранены!'
-                return render(request, 'mainapp/profile.html', {'form':form, 'message':message})
+                return render(request, 'mainapp/profile.html', {'form':form, 'message':message, 'moder':flag_moder})
             else:
+                flag_moder = check_moder(request)
+
                 error = 'Вы ввели некорректные данные!'
-                return render(request, 'mainapp/profile.html', {'form':form, 'error':error})
+                return render(request, 'mainapp/profile.html', {'form':form, 'error':error, 'moder':flag_moder})
         else:
+            flag_moder = check_moder(request)
+
             form = Change_profile(initial={'email': user.email, 'first_name': user.first_name, 'last_name': user.last_name})
-            return render(request, 'mainapp/profile.html', {'form':form, 'name':user.username})
+            return render(request, 'mainapp/profile.html', {'form':form, 'name':user.username, 'moder':flag_moder})
     else:
         return HttpResponseRedirect("/")
 
 
 def my_songs(request, id):
     if request.user.is_authenticated:
+
         user = User.objects.get(id=id)
         if user == request.user or User.objects.filter(pk=request.user.id, groups__name='Admin').exists():
             user_songs = ContentWithChords.objects.filter(creator=user).order_by('-id')
-            return render(request, 'mainapp/index.html', {'user_songs': user_songs})
+            flag_moder = check_moder(request)
+            return render(request, 'mainapp/index.html', {'user_songs': user_songs, 'moder':flag_moder})
         else:
             return HttpResponseRedirect("/")
     else:
@@ -421,7 +450,6 @@ def my_songs(request, id):
 
 def search(request):
     ser = request.GET.get('search_str')
-    flag_moder = False
 
     result = []
 
@@ -485,8 +513,7 @@ def search(request):
                                 if cr2 not in result:
                                     result.append(cr2)
 
-    if User.objects.filter(pk=request.user.id, groups__name='Moderator').exists() or User.objects.filter(pk=request.user.id, groups__name='Admin').exists():
-        flag_moder = True
+    flag_moder = check_moder(request)
     return render(request, 'mainapp/index.html', {"moder": flag_moder, 'result': result})
 
 def favourites(request, id):
@@ -509,10 +536,8 @@ def favourites(request, id):
 def my_favourites(request, id):
     if request.user.is_authenticated:
         user = User.objects.get(id=id)
-        flag_moder = False
         if user == request.user:
-            if User.objects.filter(pk=request.user.id, groups__name='Moderator').exists() or User.objects.filter(pk=request.user.id, groups__name='Admin').exists():
-                flag_moder = True
+            flag_moder = check_moder(request)
             user_favourites = Favourites.objects.filter(guitarist=user).order_by('-id')
             return render(request, 'mainapp/index.html', {'user_favourites': user_favourites, 'moder':flag_moder})
         else:
@@ -543,16 +568,18 @@ def admin_users(request):
             ser = ser.strip()
             ser = ser.title()
             result = []
-            print(ser)
             for u in users:
                 if ser in u.username.title():
                     result.append(u)
 
-            return render(request, 'mainapp/admin_users.html', {'ser': result, 'group_moder': users_in_group})
+            flag_moder = check_moder(request)
+
+            return render(request, 'mainapp/admin_users.html', {'ser': result, 'group_moder': users_in_group, 'moder':flag_moder})
 
         else:
+            flag_moder = check_moder(request)
 
-            return render(request, 'mainapp/admin_users.html', {'users':users, 'group_moder':users_in_group})
+            return render(request, 'mainapp/admin_users.html', {'users':users, 'group_moder':users_in_group, 'moder':flag_moder})
     else:
         return HttpResponseRedirect("/")
 
@@ -589,7 +616,258 @@ def admin_users_givemoder(request, id):
 
 def admin_users_moderlist(request):
     if User.objects.filter(pk=request.user.id, groups__name='Admin').exists():
+        flag_moder = check_moder(request)
+        hide_search = True
         users_in_group = Group.objects.get(name="Moderator").user_set.all()
-        return render(request, 'mainapp/admin_users.html', {'moderators': users_in_group, 'group_moder': users_in_group})
+        return render(request, 'mainapp/admin_users.html', {'moderators': users_in_group, 'group_moder': users_in_group, 'moder':flag_moder, 'hide_search':hide_search})
     else:
         return HttpResponseRedirect("/")
+
+
+def admin_singers(request):
+    if User.objects.filter(pk=request.user.id, groups__name='Moderator').exists() or User.objects.filter(pk=request.user.id, groups__name='Admin').exists():
+        flag_moder = True
+        singers = Singer.objects.all()
+        if request.method == 'POST':
+            ser = request.POST.get('search')
+            ser = ser.strip()
+            ser = ser.title()
+            result = []
+            for u in singers:
+                if ser in u.name:
+                    result.append(u)
+            return render(request, 'mainapp/admin_singers.html', {'ser': result, 'moder': flag_moder})
+
+        else:
+
+
+            return render(request, 'mainapp/admin_singers.html', {'moder':flag_moder, 'singers':singers})
+    else:
+        return HttpResponseRedirect("/")
+
+
+def admin_singers_change(request, id):
+    if User.objects.filter(pk=request.user.id, groups__name='Moderator').exists() or User.objects.filter(pk=request.user.id, groups__name='Admin').exists():
+        flag_moder = True
+        singer = Singer.objects.get(id=id)
+        albums = Album.objects.filter(singer=singer)
+
+        if request.method == 'POST':
+            name = request.POST.get('name')
+            if name != '':
+                name = name.strip()
+                name = name.title()
+                singer.name = name
+                singer.save()
+
+                return HttpResponseRedirect("/admin/singers")
+
+            else:
+                error = "Пустое поле!"
+                return render(request, 'mainapp/admin_singers_change.html', {'moder': flag_moder, 'singer': singer, 'albums':albums, 'error':error})
+        else:
+            return render(request, 'mainapp/admin_singers_change.html', {'moder':flag_moder, 'singer':singer, 'albums':albums})
+    else:
+        return HttpResponseRedirect("/")
+
+
+def admin_singers_delete(request, id):
+    if User.objects.filter(pk=request.user.id, groups__name='Moderator').exists() or User.objects.filter(pk=request.user.id, groups__name='Admin').exists():
+        singer = Singer.objects.get(id=id)
+        singer.delete()
+        return HttpResponseRedirect("/admin/singers")
+    else:
+        return HttpResponseRedirect("/")
+
+
+def admin_singers_create(request):
+    if User.objects.filter(pk=request.user.id, groups__name='Moderator').exists() or User.objects.filter(pk=request.user.id, groups__name='Admin').exists():
+        flag_moder = True
+        if request.method == 'POST':
+            name = request.POST.get('name')
+            if name != '':
+                name = name.strip()
+                name = name.title()
+                Singer.objects.create(name=name)
+
+                return HttpResponseRedirect("/admin/singers")
+            else:
+                error = "Пустое поле!"
+                return render(request, 'mainapp/admin_singers_create.html', {'moder': flag_moder, 'error':error})
+        else:
+            return render(request, 'mainapp/admin_singers_create.html', {'moder':flag_moder})
+    else:
+        return HttpResponseRedirect("/")
+
+
+def admin_albums(request):
+    if User.objects.filter(pk=request.user.id, groups__name='Moderator').exists() or User.objects.filter(pk=request.user.id, groups__name='Admin').exists():
+        flag_moder = True
+        albums = Album.objects.all()
+        if request.method == 'POST':
+            ser = request.POST.get('search')
+            ser = ser.strip()
+            ser = ser.title()
+            result = []
+            for u in albums:
+                if ser in u.title:
+                    result.append(u)
+            return render(request, 'mainapp/admin_albums.html', {'ser': result, 'moder': flag_moder})
+
+        else:
+
+            return render(request, 'mainapp/admin_albums.html', {'moder':flag_moder, 'albums':albums})
+    else:
+        return HttpResponseRedirect("/")
+
+
+def admin_albums_change(request, id):
+    if User.objects.filter(pk=request.user.id, groups__name='Moderator').exists() or User.objects.filter(pk=request.user.id, groups__name='Admin').exists():
+        flag_moder = True
+        album = Album.objects.get(id=id)
+        singers = Singer.objects.all()
+        songs = Song.objects.filter(album=album)
+
+        if request.method == 'POST':
+            title = request.POST.get('title')
+            if title != '':
+                title = title.strip()
+                title = title.title()
+                album.title = title
+
+                singer_id = request.POST['selected_singer']
+                album.singer = Singer.objects.get(id=singer_id)
+
+                album.save()
+
+                return HttpResponseRedirect("/admin/albums")
+
+            else:
+                error = "Пустое поле!"
+                return render(request, 'mainapp/admin_albums_change.html', {'moder': flag_moder, 'album': album, 'singers':singers, 'songs':songs, 'error': error})
+        else:
+            return render(request, 'mainapp/admin_albums_change.html', {'moder': flag_moder, 'album': album, 'singers':singers, 'songs':songs})
+    else:
+        return HttpResponseRedirect("/")
+
+
+def admin_albums_delete(request, id):
+    if User.objects.filter(pk=request.user.id, groups__name='Moderator').exists() or User.objects.filter(pk=request.user.id, groups__name='Admin').exists():
+        album = Album.objects.get(id=id)
+        album.delete()
+        return HttpResponseRedirect("/admin/albums")
+    else:
+        return HttpResponseRedirect("/")
+
+
+def admin_albums_create(request):
+    if User.objects.filter(pk=request.user.id, groups__name='Moderator').exists() or User.objects.filter(pk=request.user.id, groups__name='Admin').exists():
+        flag_moder = True
+        singers = Singer.objects.all()
+        if request.method == 'POST':
+            name = request.POST.get('name')
+            if name != '':
+                name = name.strip()
+                name = name.title()
+                singer_id = request.POST['selected_singer']
+                Album.objects.create(title=name, singer=Singer.objects.get(id=singer_id))
+
+                return HttpResponseRedirect("/admin/albums")
+            else:
+                error = "Пустое поле!"
+                return render(request, 'mainapp/admin_albums_create.html', {'moder': flag_moder, 'error':error, 'singers':singers})
+        else:
+            return render(request, 'mainapp/admin_albums_create.html', {'moder':flag_moder, 'singers':singers})
+    else:
+        return HttpResponseRedirect("/")
+
+
+def admin_songs(request):
+    if User.objects.filter(pk=request.user.id, groups__name='Moderator').exists() or User.objects.filter(pk=request.user.id, groups__name='Admin').exists():
+        flag_moder = True
+        songs = Song.objects.all()
+        if request.method == 'POST':
+            ser = request.POST.get('search')
+            ser = ser.strip()
+            ser = ser.title()
+            result = []
+            for u in songs:
+                if ser in u.title:
+                    result.append(u)
+            return render(request, 'mainapp/admin_songs.html', {'ser': result, 'moder': flag_moder})
+
+        else:
+
+            return render(request, 'mainapp/admin_songs.html', {'moder':flag_moder, 'songs':songs})
+    else:
+        return HttpResponseRedirect("/")
+
+
+def admin_songs_change(request, id):
+    if User.objects.filter(pk=request.user.id, groups__name='Moderator').exists() or User.objects.filter(pk=request.user.id, groups__name='Admin').exists():
+        flag_moder = True
+        song = Song.objects.get(id=id)
+        albums = Album.objects.all()
+        cwc = ContentWithChords.objects.filter(song=song)
+        cwc = cwc.count()
+
+        if request.method == 'POST':
+            title = request.POST.get('title')
+            if title != '':
+                title = title.strip()
+                title = title.title()
+                song.title = title
+
+                album_id = request.POST['selected_album']
+                song.album = Album.objects.get(id=album_id)
+
+                song.save()
+
+                return HttpResponseRedirect("/admin/songs")
+
+            else:
+                error = "Пустое поле!"
+                return render(request, 'mainapp/admin_songs_change.html', {'moder': flag_moder, 'albums': albums, 'song':song, 'cwc':cwc, 'error':error})
+        else:
+            return render(request, 'mainapp/admin_songs_change.html', {'moder': flag_moder, 'albums': albums, 'song':song, 'cwc':cwc})
+    else:
+        return HttpResponseRedirect("/")
+
+
+def admin_songs_delete(request, id):
+    if User.objects.filter(pk=request.user.id, groups__name='Moderator').exists() or User.objects.filter(pk=request.user.id, groups__name='Admin').exists():
+        song = Song.objects.get(id=id)
+        song.delete()
+        return HttpResponseRedirect("/admin/songs")
+    else:
+        return HttpResponseRedirect("/")
+
+
+def admin_songs_create(request):
+    if User.objects.filter(pk=request.user.id, groups__name='Moderator').exists() or User.objects.filter(pk=request.user.id, groups__name='Admin').exists():
+        flag_moder = True
+        albums = Album.objects.all()
+        if request.method == 'POST':
+            name = request.POST.get('name')
+            if name != '':
+                name = name.strip()
+                name = name.title()
+                album_id = request.POST['selected_album']
+                Song.objects.create(title=name, album=Album.objects.get(id=album_id))
+
+                return HttpResponseRedirect("/admin/songs")
+            else:
+                error = "Пустое поле!"
+                return render(request, 'mainapp/admin_songs_create.html', {'moder': flag_moder, 'error':error, 'albums':albums})
+        else:
+            return render(request, 'mainapp/admin_songs_create.html', {'moder':flag_moder, 'albums':albums})
+    else:
+        return HttpResponseRedirect("/")
+
+
+def check_moder(request):
+    flag_moder = False
+    if User.objects.filter(pk=request.user.id, groups__name='Moderator').exists() or User.objects.filter(pk=request.user.id, groups__name='Admin').exists():
+        flag_moder = True
+
+    return flag_moder

@@ -1,0 +1,27 @@
+{% extends 'mainapp/base.html' %}
+{% block title %}{{singer.name}}{% endblock %}
+{%block site_content %}
+<h3>Изменение исполнителя {{singer.name}}</h3>
+
+<br>
+<form method="POST">
+    {% csrf_token %}
+    <input name="name" type="text" placeholder="Новое имя">
+    <button type="submit">Изменить</button>
+    <a href="/admin/singers/delete/{{singer.id}}">Удалить</a>
+    <a href="/admin/singers">Отмена</a>
+</form>
+{{error}}
+<br>
+<h4>Список альбомов исполнителя</h4>
+
+<table>
+    {% for album in albums %}
+        <tr>
+            <td>{{album.title}}</td>
+        </tr>
+    {% endfor %}
+</table>
+
+
+{%endblock%}
