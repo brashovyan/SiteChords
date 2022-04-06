@@ -1,0 +1,27 @@
+{% extends 'mainapp/base.html' %}
+{% block title %}Создание вариации аккорда{% endblock %}
+{%block site_content %}
+<style>
+    a {
+    text-decoration: none;
+  }
+</style>
+
+<form method="POST">
+    {% csrf_token %}
+
+    &nbsp;<select name='selected_chord'>
+        {% for chord in chords %}
+                <option value='{{chord.id}}'>{{ chord.title }}</option>
+
+        {% endfor %}
+    </select>
+
+    <input style="width: 350px;" name="name" type="text" placeholder="Введите содержание">
+
+    <button type="submit">Создать</button>
+    <a href="/admin/chordvars">Отмена</a>
+</form>
+&nbsp;{{ error }}
+
+{%endblock%}

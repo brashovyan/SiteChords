@@ -1,17 +1,23 @@
 {% extends 'mainapp/base.html' %}
 {% block title %}Панель администратора{% endblock %}
-{%block site_content %}
+{% block site_content %}
 
-<a href="/admin/songs">Песни</a>
-<a href="/admin/albums">Альбомы</a>
-<a href="/admin/singers">Исполнители</a>
-        {% if admin == True %}
-<a href="/admin/users">Пользователи</a>
-        {% endif %}
+<style>
+    a {
+    text-decoration: none;
+  }
+</style>
 
-
-
-
-
+<ul style="font-size: 18px;">
+        <li><a href="/admin/chordvars">Вариации аккордов</a></li>
+        <li><a href="/admin/chords">Аккорды</a></li>
+        <li><a href="/">Контент с аккордами</a></li>
+        <li><a href="/admin/songs">Песни</a></li>
+        <li><a href="/admin/albums">Альбомы</a></li>
+        <li><a href="/admin/singers">Исполнители</a></li>
+                {% if admin == True %}
+        <li><a href="/admin/users">Пользователи</a></li>
+                {% endif %}
+</ul>
 
 {% endblock %}

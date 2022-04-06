@@ -1,5 +1,5 @@
 {% extends 'mainapp/base.html' %}
-{% block title %}Альбомы{% endblock %}
+{% block title %}Аккорды{% endblock %}
 {%block site_content %}
 
 <style>
@@ -17,35 +17,35 @@
 <form method="POST">
     {% csrf_token %}
     &nbsp;<input name="search" type="text" placeholder="Поиск...">
-    <a href="/admin/albums/create">Создать</a>
+    <a href="/admin/chords/create">Создать</a>
     {% if ser != null %}
-        <a href="/admin/albums">Назад</a>
+        <a href="/admin/chords">Назад</a>
     {% endif %}
 </form>
 <br>
 
      {% if ser == null %}
- <table>
-     <tr><th>Id</th><th>Альбом</th><th></th></tr>
-         {% for album in albums %}
+    <table>
+        <tr><th>Id</th><th>Аккорд</th><th></th></tr>
+         {% for chord in chords %}
             <tr>
-                <td>{{album.id}}</td>
-                <td>{{album.title}}</td>
-                <td><a href="/admin/albums/change/{{album.id}}">Изменить</a></td>
+                <td>{{chord.id}}</td>
+                <td>{{chord.title}}</td>
+                <td><a href="/admin/chords/change/{{chord.id}}">Изменить</a></td>
             </tr>
          {% endfor %}
-     </table>
+      </table>
      {% else %}
- <table>
-     <tr><th>Id</th><th>Альбом</th><th></th></tr>
+    <table>
+        <tr><th>Id</th><th>Аккорд</th><th></th></tr>
      {% for s in ser %}
             <tr>
                 <td>{{s.id}}</td>
                 <td>{{s.title}}</td>
-                <td><a href="/admin/albums/change/{{s.id}}">Изменить</a></td>
+                <td><a href="/admin/chords/change/{{s.id}}">Изменить</a></td>
             </tr>
          {% endfor %}
-      </table>
+         </table>
      {% endif %}
 
 {%endblock%}

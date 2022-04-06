@@ -1,0 +1,50 @@
+{% extends 'mainapp/base.html' %}
+{% block title %}Вариации аккордов{% endblock %}
+{%block site_content %}
+<style>
+    a {
+    text-decoration: none;
+  }
+
+  TD, TH {
+    padding: 5px;
+    font-size: 18px;
+    border: 1px solid grey;
+   }
+</style>
+
+<form method="POST">
+    {% csrf_token %}
+    &nbsp;<input name="search" type="text" placeholder="Поиск...">
+    <a href="/admin/chordvars/create">Создать</a>
+    {% if ser != null %}
+        <a href="/admin/chordvars">Назад</a>
+    {% endif %}
+</form>
+<br>
+
+     {% if ser == null %}
+    <table>
+        <tr><th>Id</th><th>Аккорд</th><th></th></tr>
+         {% for chordvar in chordvars %}
+            <tr>
+                <td>{{chordvar.id}}</td>
+                <td>{{chordvar.chord.title}}</td>
+                <td><a href="/admin/chordvars/change/{{chordvar.id}}">Изменить</a></td>
+            </tr>
+         {% endfor %}
+         </table>
+     {% else %}
+ <table>
+     <tr><th>Id</th><th>Аккорд</th><th></th></tr>
+     {% for s in ser %}
+            <tr>
+                <td>{{s.id}}</td>
+                <td>{{s.chord.title}}</td>
+                <td><a href="/admin/chordvars/change/{{s.id}}">Изменить</a></td>
+            </tr>
+         {% endfor %}
+      </table>
+     {% endif %}
+
+{%endblock%}

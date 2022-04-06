@@ -1,17 +1,17 @@
 {% extends 'mainapp/base.html' %}
-{% block title %}Создание исполнителя{% endblock %}
+{% block title %}Создание аккорда{% endblock %}
 {%block site_content %}
 <style>
     a {
     text-decoration: none;
   }
-
 </style>
+
 <form method="POST">
     {% csrf_token %}
-    &nbsp;<input style="width: 350px;" name="name" type="text" placeholder="Введите имя исполнителя">
+    &nbsp;<input style="width: 350px;" name="name" type="text" placeholder="Введите название аккорда">
     <button type="submit">Создать</button>
-    <a href="/admin/singers">Отмена</a>
+    <a href="/admin/chords">Отмена</a>
 </form>
 &nbsp;{{ error }}
 

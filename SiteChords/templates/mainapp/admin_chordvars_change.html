@@ -1,0 +1,34 @@
+{% extends 'mainapp/base.html' %}
+{% block title %}{{chordvar.chord.title}}{% endblock %}
+{%block site_content %}
+<style>
+    a {
+    text-decoration: none;
+  }
+
+</style>
+<h3>&nbsp;Изменение аккорда {{chordvar.chord.title}}</h3>
+
+<br>
+<form method="POST">
+    {% csrf_token %}
+
+    &nbsp;&nbsp;<select name='selected_chord'>
+        <option value="{{chordvar.chord.id}}">{{chordvar.chord.title}}</option>
+        {% for chord in chords %}
+            {% if chord != chordvar.chord %}
+                <option value='{{chord.id}}'>{{ chord.title }}</option>
+            {% endif %}
+        {% endfor %}
+    </select>
+
+    <input style="width: 350px;" name="name" value='{{chordvar.content}}' type="text" placeholder="Новое содержание">
+
+    <button type="submit">Изменить</button>
+    <a href="/admin/chordvars/delete/{{chordvar.id}}">Удалить</a>
+    <a href="/admin/chordvars">Отмена</a>
+</form>
+&nbsp;{{error}}
+<br>
+
+{%endblock%}

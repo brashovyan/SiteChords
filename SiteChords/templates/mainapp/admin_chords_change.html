@@ -1,0 +1,23 @@
+{% extends 'mainapp/base.html' %}
+{% block title %}{{chord.title}}{% endblock %}
+{%block site_content %}
+<style>
+    a {
+    text-decoration: none;
+  }
+</style>
+
+<h3>&nbsp;Изменение аккорда {{chord.title}}</h3>
+
+<br>
+<form method="POST">
+    {% csrf_token %}
+    &nbsp;<input style="width: 350px;" name="name" type="text" placeholder="Новое название">
+    <button type="submit">Изменить</button>
+    <a href="/admin/chords/delete/{{chord.id}}">Удалить</a>
+    <a href="/admin/chords">Отмена</a>
+</form>
+&nbsp;{{error}}
+<br>
+
+{%endblock%}

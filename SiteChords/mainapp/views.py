@@ -151,7 +151,7 @@ def create(request):
                 return HttpResponseRedirect("/")
             else:
                 flag_moder = check_moder(request)
-
+                form = CreateForm(request.POST)
                 error = "Некорректно заполненная форма!"
                 return render(request, 'mainapp/create.html', {"form": form, 'error': error, 'moder':flag_moder})
 
@@ -168,11 +168,11 @@ def register(request):
     if request.method == "POST":
         form = RegForm(request.POST)
         if form.is_valid():
+            username = request.POST.get('username')
+            email = request.POST.get('email')
             password1 = request.POST.get('password1')
             password2 = request.POST.get('password2')
             if password1 == password2:
-                username = request.POST.get('username')
-                email = request.POST.get('email')
                 try:
                     user = User.objects.create_user(username, email, password1)
                 except:
@@ -189,12 +189,11 @@ def register(request):
                 return HttpResponseRedirect("/")
             else:
                 error = "Пароли не совпадают!"
-                #form = RegisterForm()
+                form = RegForm()
                 return render(request, 'mainapp/register.html', {'form': form, 'error':error})
 
         else:
             error = "Вы ввели некорректные данные! Повторите попытку, заполнив все поля по подсказкам."
-            form = RegForm()
             return render(request, 'mainapp/register.html', {'form': form, 'error': error})
     else:
         form = RegForm()
@@ -213,7 +212,6 @@ def login1(request):
             return HttpResponseRedirect("/")
         else:
             error = "Неверный логин или пароль! Проверьте раскладку языка. Также напоминаем, что буквы верхнего и нижнего регистра (строчные и заглавные) отличаются между собой."
-            #form = LoginForm()
             return render(request, 'mainapp/login.html', {'error': error})
 
     else:
@@ -414,17 +412,17 @@ def profile(request, id):
                         user.save()
                     else:
                         error = 'Пароли не совпадают!'
-                        return render(request, 'mainapp/profile.html', {'form': form, 'error': error, 'moder':flag_moder})
+                        return render(request, 'mainapp/profile.html', {'form': form, 'error': error, 'moder':flag_moder, 'name':user.username})
                 else:
                     user.save()
 
                 message = 'Изменения успешно сохранены!'
-                return render(request, 'mainapp/profile.html', {'form':form, 'message':message, 'moder':flag_moder})
+                return render(request, 'mainapp/profile.html', {'form':form, 'message':message, 'moder':flag_moder, 'name':user.username})
             else:
                 flag_moder = check_moder(request)
 
                 error = 'Вы ввели некорректные данные!'
-                return render(request, 'mainapp/profile.html', {'form':form, 'error':error, 'moder':flag_moder})
+                return render(request, 'mainapp/profile.html', {'form':form, 'error':error, 'moder':flag_moder, 'name':user.username})
         else:
             flag_moder = check_moder(request)
 
@@ -599,7 +597,7 @@ def admin_users_deletemoder(request, id):
         user = User.objects.get(id=id)
         group = Group.objects.get(name='Moderator')
         user.groups.remove(group)
-        return HttpResponseRedirect("/admin/users")
+        return HttpResponseRedirect("/admin/users/moder_list")
     else:
         return HttpResponseRedirect("/")
 
@@ -871,3 +869,149 @@ def check_moder(request):
         flag_moder = True
 
     return flag_moder
+
+
+def admin_chords(request):
+    if User.objects.filter(pk=request.user.id, groups__name='Moderator').exists() or User.objects.filter(pk=request.user.id, groups__name='Admin').exists():
+        flag_moder = True
+        chords = Chord.objects.all()
+        if request.method == 'POST':
+            ser = request.POST.get('search')
+            ser = ser.strip()
+            result = []
+            for u in chords:
+                if ser in u.title:
+                    result.append(u)
+            return render(request, 'mainapp/admin_chords.html', {'ser': result, 'moder': flag_moder})
+
+        else:
+
+            return render(request, 'mainapp/admin_chords.html', {'moder': flag_moder, 'chords': chords})
+    else:
+        return HttpResponseRedirect("/")
+
+
+def admin_chords_change(request, id):
+    if User.objects.filter(pk=request.user.id, groups__name='Moderator').exists() or User.objects.filter(pk=request.user.id, groups__name='Admin').exists():
+        flag_moder = True
+        chord = Chord.objects.get(id=id)
+
+        if request.method == 'POST':
+            name = request.POST.get('name')
+            if name != '':
+                name = name.strip()
+                chord.title = name
+                chord.save()
+
+                return HttpResponseRedirect("/admin/chords")
+
+            else:
+                error = "Пустое поле!"
+                return render(request, 'mainapp/admin_chords_change.html', {'moder': flag_moder, 'chord': chord, 'error':error})
+        else:
+            return render(request, 'mainapp/admin_chords_change.html', {'moder':flag_moder, 'chord':chord})
+    else:
+        return HttpResponseRedirect("/")
+
+
+def admin_chords_delete(request, id):
+    if User.objects.filter(pk=request.user.id, groups__name='Moderator').exists() or User.objects.filter(pk=request.user.id, groups__name='Admin').exists():
+        chord = Chord.objects.get(id=id)
+        chord.delete()
+        return HttpResponseRedirect("/admin/chords")
+    else:
+        return HttpResponseRedirect("/")
+
+
+def admin_chords_create(request):
+    if User.objects.filter(pk=request.user.id, groups__name='Moderator').exists() or User.objects.filter(pk=request.user.id, groups__name='Admin').exists():
+        flag_moder = True
+        if request.method == 'POST':
+            name = request.POST.get('name')
+            if name != '':
+                name = name.strip()
+                Chord.objects.create(title=name)
+
+                return HttpResponseRedirect("/admin/chords")
+            else:
+                error = "Пустое поле!"
+                return render(request, 'mainapp/admin_chords_create.html', {'moder': flag_moder, 'error':error})
+        else:
+            return render(request, 'mainapp/admin_chords_create.html', {'moder':flag_moder})
+    else:
+        return HttpResponseRedirect("/")
+
+
+def admin_chordvars(request):
+    if User.objects.filter(pk=request.user.id, groups__name='Moderator').exists() or User.objects.filter(pk=request.user.id, groups__name='Admin').exists():
+        flag_moder = True
+        chordvars = ChordVariation.objects.all()
+        if request.method == 'POST':
+            ser = request.POST.get('search')
+            ser = ser.strip()
+            result = []
+            for u in chordvars:
+                if ser in u.chord.title:
+                    result.append(u)
+            return render(request, 'mainapp/admin_chordvars.html', {'ser': result, 'moder': flag_moder})
+
+        else:
+
+            return render(request, 'mainapp/admin_chordvars.html', {'moder': flag_moder, 'chordvars': chordvars})
+    else:
+        return HttpResponseRedirect("/")
+
+
+def admin_chordvars_change(request, id):
+    if User.objects.filter(pk=request.user.id, groups__name='Moderator').exists() or User.objects.filter(pk=request.user.id, groups__name='Admin').exists():
+        flag_moder = True
+        chordvar = ChordVariation.objects.get(id=id)
+        chords = Chord.objects.all()
+
+        if request.method == 'POST':
+            name = request.POST.get('name')
+            if name != '':
+                name = name.strip()
+                chord_id = request.POST['selected_chord']
+                chordvar.chord = Chord.objects.get(id=chord_id)
+                chordvar.content = name
+                chordvar.save()
+
+                return HttpResponseRedirect("/admin/chordvars")
+
+            else:
+                error = "Пустое поле!"
+                return render(request, 'mainapp/admin_chordvars_change.html', {'moder': flag_moder, 'chords': chords, 'chordvar':chordvar, 'error':error})
+        else:
+            return render(request, 'mainapp/admin_chordvars_change.html', {'moder':flag_moder, 'chords':chords, 'chordvar':chordvar})
+    else:
+        return HttpResponseRedirect("/")
+
+def admin_chordvars_delete(request, id):
+    if User.objects.filter(pk=request.user.id, groups__name='Moderator').exists() or User.objects.filter(pk=request.user.id, groups__name='Admin').exists():
+        chordvar = ChordVariation.objects.get(id=id)
+        chordvar.delete()
+        return HttpResponseRedirect("/admin/chordvars")
+    else:
+        return HttpResponseRedirect("/")
+
+
+def admin_chordvars_create(request):
+    if User.objects.filter(pk=request.user.id, groups__name='Moderator').exists() or User.objects.filter(pk=request.user.id, groups__name='Admin').exists():
+        flag_moder = True
+        chords = Chord.objects.all()
+        if request.method == 'POST':
+            name = request.POST.get('name')
+            if name != '':
+                name = name.strip()
+                chord_id = request.POST['selected_chord']
+                ChordVariation.objects.create(chord=Chord.objects.get(id=chord_id), content=name)
+
+                return HttpResponseRedirect("/admin/chordvars")
+            else:
+                error = "Пустое поле!"
+                return render(request, 'mainapp/admin_chordvars_create.html', {'moder': flag_moder, 'chords':chords, 'error':error})
+        else:
+            return render(request, 'mainapp/admin_chordvars_create.html', {'moder':flag_moder, 'chords':chords})
+    else:
+        return HttpResponseRedirect("/")

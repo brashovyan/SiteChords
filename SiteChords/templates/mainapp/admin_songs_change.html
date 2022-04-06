@@ -1,12 +1,17 @@
 {% extends 'mainapp/base.html' %}
 {% block title %}{{song.title}}{% endblock %}
 {%block site_content %}
-<h3>Изменение песни {{song.title}}</h3>
+<style>
+    a {
+    text-decoration: none;
+  }
+</style>
+<h3>&nbsp;Изменение песни {{song.title}}</h3>
 
 <br>
 <form method="POST">
     {% csrf_token %}
-    <input name="title" value='{{song.title}}' type="text" placeholder="Новое название">
+    &nbsp;&nbsp;<input style="width: 350px;" name="title" value='{{song.title}}' type="text" placeholder="Новое название">
 
     <select name='selected_album'>
         <option value="{{song.album.id}}">{{song.album}}</option>
@@ -21,8 +26,9 @@
     <a href="/admin/songs/delete/{{song.id}}">Удалить</a>
     <a href="/admin/songs">Отмена</a>
 </form>
-{{error}}
-<h4>Кол-во контента:</h4>
-{{ cwc }}
+&nbsp;{{error}}
+<br>
+<h4>&nbsp;Кол-во контента:</h4>
+&nbsp;&nbsp;{{ cwc }}
 
 {%endblock%}

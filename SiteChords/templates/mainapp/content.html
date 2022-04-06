@@ -9,9 +9,9 @@
     <h3>Создатель: {{ song.creator }}</h3>
     {% if user.is_authenticated %}
         {% if flag_favourite == False %}
-        <a href="/favourites/{{song.id}}">Добавить в избранное</a>
+        <a href="/favourites/{{song.id}}">&nbsp;&nbsp;&nbsp;Добавить в избранное</a>
         {% else %}
-        <a href="/favourites/{{song.id}}">Убрать из избранного</a>
+        <a href="/favourites/{{song.id}}">&nbsp;&nbsp;&nbsp;Убрать из избранного</a>
         {% endif %}
     {% endif %}
     <br>

@@ -1,15 +1,23 @@
 {% extends 'mainapp/base.html' %}
 {% block title %}{{album.title}}{% endblock %}
 {%block site_content %}
-<h3>Изменение альбома {{album.title}}</h3>
+
+<style>
+    a {
+    text-decoration: none;
+  }
+
+</style>
+
+<h3>&nbsp;Изменение альбома {{album.title}}</h3>
 
 <br>
 <form method="POST">
     {% csrf_token %}
-    <input name="title" value='{{album.title}}' type="text" placeholder="Новое название">
+    &nbsp;&nbsp;<input style="width: 350px;" name="title" value='{{album.title}}' type="text" placeholder="Новое название">
 
     <select name='selected_singer'>
-        <option value="{{album.singer}}">{{album.singer}}</option>
+        <option value="{{album.singer.id}}">{{album.singer}}</option>
         {% for singer in singers %}
             {% if singer != album.singer %}
                 <option value='{{singer.id}}'>{{ singer }}</option>
@@ -21,14 +29,14 @@
     <a href="/admin/albums/delete/{{album.id}}">Удалить</a>
     <a href="/admin/albums">Отмена</a>
 </form>
-{{error}}
-
-<h4>Список песен из альбома</h4>
+&nbsp;{{error}}
+<br>
+<h4>&nbsp;Список песен из альбома</h4>
 
 <table>
     {% for song in songs %}
         <tr>
-            <td>{{song.title}}</td>
+            <td>&nbsp;&nbsp;{{song.title}}</td>
         </tr>
     {% endfor %}
 </table>

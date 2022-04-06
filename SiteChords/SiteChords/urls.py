@@ -53,4 +53,12 @@ urlpatterns = [
     path('admin/songs/change/<int:id>', views.admin_songs_change, name='admin_songs_change'),
     path('admin/songs/delete/<int:id>', views.admin_songs_delete, name='admin_songs_delete'),
     path('admin/songs/create', views.admin_songs_create, name='admin_songs_create'),
+    path('admin/chords', views.admin_chords, name ='admin_chords'),
+    path('admin/chords/change/<int:id>', views.admin_chords_change, name='admin_chords_change'),
+    path('admin/chords/delete/<int:id>', views.admin_chords_delete, name='admin_chords_delete'),
+    path('admin/chords/create', views.admin_chords_create, name='admin_chords_create'),
+    path('admin/chordvars', views.admin_chordvars, name='admin_chordvars'),
+    path('admin/chordvars/change/<int:id>', views.admin_chordvars_change, name='admin_chordvars_change'),
+    path('admin/chordvars/delete/<int:id>', views.admin_chordvars_delete, name='admin_chordvars_delete'),
+    path('admin/chordvars/create', views.admin_chordvars_create, name='admin_chordvars_create'),
 ]

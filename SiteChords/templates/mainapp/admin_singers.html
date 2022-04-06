@@ -2,19 +2,33 @@
 {% block title %}Исполнители{% endblock %}
 {%block site_content %}
 
+<style>
+    a {
+    text-decoration: none;
+  }
+
+  TD, TH {
+    padding: 5px;
+    font-size: 18px;
+    border: 1px solid grey;
+   }
+</style>
+
 <form method="POST">
     {% csrf_token %}
-    <input name="search" type="text" placeholder="Поиск...">
+    &nbsp;<input name="search" type="text" placeholder="Поиск...">
     <a href="/admin/singers/create">Создать</a>
     {% if ser != null %}
         <a href="/admin/singers">Назад</a>
     {% endif %}
 </form>
-
+<br>
  <table>
+     <tr><th>Id</th><th>Исполнитель</th><th></th></tr>
      {% if ser == null %}
          {% for singer in singers %}
             <tr>
+                <td>{{singer.id}}</td>
                 <td>{{singer.name}}</td>
                 <td><a href="/admin/singers/change/{{singer.id}}">Изменить</a></td>
             </tr>
@@ -23,6 +37,7 @@
 
      {% for s in ser %}
             <tr>
+                <td>{{s.id}}</td>
                 <td>{{s.name}}</td>
                 <td><a href="/admin/singers/change/{{s.id}}">Изменить</a></td>
             </tr>

@@ -1,8 +1,22 @@
-TD, TH {
-    background: white;
-    padding: 15px;
-    font-size: 20px;
-   }
+.main_table table {
+	width: 100%;
+	border: 15px solid #F0FFFF;
+	border-top: 5px solid #F0FFFF;
+	border-collapse: collapse;
+}
+.main_table th {
+	font-weight: bold;
+	padding: 5px;
+	background: #F0FFFF;
+	border: none;
+	border-bottom: 5px solid #F0FFFF;
+}
+.main_table td {
+	padding: 5px;
+	border: none;
+	font-size: 20px;
+	border-bottom: 5px solid #F0FFFF;
+}
 
 h5 {
    text-indent:10px;
@@ -10,3 +24,7 @@ h5 {
    font-size: 20px;
    color: #151130;
    }
+
+a {
+    text-decoration: none;
+  }

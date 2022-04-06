@@ -11,6 +11,10 @@ h6 {
    font-size: 14px;
    color: #000000;
    }
+
+   a {
+    text-decoration: none;
+  }
 </style>
 
 <div class="col-md-10 mx-auto col-lg-5">
@@ -21,7 +25,7 @@ h6 {
           <div class="form-group">
             {{ form.username.label }}{{ form.username }}
           </div>
-            <h6>Подсказка: логин не может содержать в себе пробелы.</h6>
+            <h6>Подсказка: логин  не может содержать в себе пробелы, кириллицу и спец. знаки (кроме _ и -).</h6>
             <br>
           <div class="form-group">
             {{ form.email.label }}{{ form.email }}

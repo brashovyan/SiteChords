@@ -1,19 +1,40 @@
 {% extends 'mainapp/base.html' %}
 {% block title %}Пользователи{% endblock %}
 {%block site_content %}
+
+<style>
+    a {
+    text-decoration: none;
+  }
+
+  TD, TH {
+    padding: 5px;
+    font-size: 18px;
+    border: 1px solid grey;
+   }
+</style>
+
+
 <form method="POST">
     {% csrf_token %}
     {% if hide_search == null %}
-        <input name="search" type="text" placeholder="Поиск...">
+        &nbsp;<input name="search" type="text" placeholder="Поиск...">
         <a href="/admin/users/moder_list">Список модераторов</a>
+        {% if ser != null %}
+            &nbsp;<a href="/admin/users">Назад</a>
+        {% endif %}
     {% else %}
-        <a href="/admin/users">К списку пользователей</a>
+        &nbsp;<a href="/admin/users">Назад</a>
     {% endif %}
 </form>
+<br>
+
     {% if ser == null and moderators == null %}
+    <table>
+        <tr><th>Id</th><th>Пользователь</th><th></th><th></th><th></th><th></th></tr>
         {% for user in users %}
-            <table>
                 <tr>
+                    <td>{{ user.id }}</td>
                     <td>{{ user.username }}</td>
                     <td><a href="/profile/{{user.id}}">Изменить</a></td>
                     <td><a href="/admin/users/delete/{{user.id}}">Удалить</a></td>
@@ -24,13 +45,19 @@
                     {% endif %}
                         <td><a href="/my/{{user.id}}">Список песен</a></td>
                 </tr>
-            </table>
         {% endfor %}
+    </table>
     {% endif %}
+
+
+
     {% if ser != null %}
+        <table>
+        <tr><th>Id</th><th>Пользователь</th><th></th><th></th><th></th><th></th></tr>
         {% for s in ser %}
-            <table>
+
                 <tr>
+                    <td>{{ s.id }}</td>
                     <td>{{ s }}</td>
                     <td><a href="/profile/{{s.id}}">Изменить</a></td>
                     <td><a href="/admin/users/delete/{{s.id}}">Удалить</a></td>
@@ -41,12 +68,16 @@
                     {% endif %}
                         <td><a href="/my/{{s.id}}">Список песен</a></td>
                 </tr>
-            </table>
         {% endfor %}
-    {% else %}
+        </table>
+
+        {% elif moderators != null %}
+        <table>
+            <tr><th>Id</th><th>Пользователь</th><th></th><th></th><th></th><th></th></tr>
         {% for moder in moderators %}
-            <table>
+
                 <tr>
+                    <td>{{ moder.id }}</td>
                     <td>{{ moder }}</td>
                     <td><a href="/profile/{{moder.id}}">Изменить</a></td>
                     <td><a href="/admin/users/delete/{{moder.id}}">Удалить</a></td>
@@ -57,7 +88,8 @@
                     {% endif %}
                         <td><a href="/my/{{moder.id}}">Список песен</a></td>
                 </tr>
-            </table>
         {% endfor %}
+        </table>
+
     {% endif %}
 {% endblock %}

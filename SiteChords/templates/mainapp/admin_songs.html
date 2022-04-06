@@ -2,31 +2,50 @@
 {% block title %}Песни{% endblock %}
 {%block site_content %}
 
+<style>
+    a {
+    text-decoration: none;
+  }
+
+  TD, TH {
+    padding: 5px;
+    font-size: 18px;
+    border: 1px solid grey;
+   }
+</style>
+
 <form method="POST">
     {% csrf_token %}
-    <input name="search" type="text" placeholder="Поиск...">
+    &nbsp;<input name="search" type="text" placeholder="Поиск...">
     <a href="/admin/songs/create">Создать</a>
     {% if ser != null %}
         <a href="/admin/songs">Назад</a>
     {% endif %}
 </form>
+<br>
 
- <table>
      {% if ser == null %}
+    <table>
+        <tr><th>Id</th><th>Песня</th><th></th></tr>
          {% for song in songs %}
             <tr>
+                <td>{{song.id}}</td>
                 <td>{{song.title}}</td>
                 <td><a href="/admin/songs/change/{{song.id}}">Изменить</a></td>
             </tr>
          {% endfor %}
+    </table>
      {% else %}
-
+    <table>
+        <tr><th>Id</th><th>Песня</th><th></th></tr>
      {% for s in ser %}
             <tr>
+                <td>{{s.id}}</td>
                 <td>{{s.title}}</td>
                 <td><a href="/admin/songs/change/{{s.id}}">Изменить</a></td>
             </tr>
          {% endfor %}
-     {% endif %}
- </table>
+
+    </table>
+{% endif %}
 {%endblock%}
