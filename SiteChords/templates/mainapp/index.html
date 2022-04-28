@@ -4,10 +4,30 @@
 {% load static %}
 <link href= '{% static "css/index.css" %}' rel="stylesheet" >
 
+    {% if result == null and user_songs == null and user_favourites == null %}
+     <form action="{% url 'home' %}" method="get">
+         <label for="filter">Фильтр:</label>
+        <select name='filter' id="filter">
+            {% if selected_filter == 'new_old' %}
+                <option value='new_old' selected>От новых к старым</option>
+                <option value='old_new'>От старых к новым</option>
+                <option value='likes'>По лайкам</option>
+            {% elif selected_filter == 'old_new' %}
+                <option value='new_old'>От новых к старым</option>
+                <option value='old_new' selected>От старых к новым</option>
+                <option value='likes'>По лайкам</option>
+            {% else %}
+                <option value='new_old'>От новых к старым</option>
+                <option value='old_new'>От старых к новым</option>
+                <option value='likes' selected>По лайкам</option>
+            {% endif %}
+        </select>
+         <button type="submit">Применить</button>
+    </form>
+
 <div class="main_table">
     <table>
-        {% if result == null and user_songs == null and user_favourites == null %}
-            <tr><th>Исполнитель</th><th>Альбом</th><th>Песня</th><th>Создатель</th><th></th><th></th></tr>
+            <tr><th>Исполнитель</th><th>Альбом</th><th>Песня</th><th>Создатель</th><th>Лайки</th><th></th><th></th></tr>
             {% for song in page_obj %}
             <!--<tr onclick="window.location.href='/content/{{song.id}}'"> вся строка это ссылка, но на деле не очень-->
             <tr>
@@ -15,6 +35,7 @@
                 <td>{{ song.song.album }}</td>
                 <td>{{ song.song }}</td>
                 <td>{{ song.creator }}</td>
+                <td>{{ song.likes }}</td>
                 <td><a href="/content/{{song.id}}">Просмотр</a></td>
                 {% if moder == True  or song.creator == user %}
                     <td><a href="/change/{{song.id}}">Изменить</a></td>
@@ -23,6 +44,7 @@
             {% endfor %}
         {% endif %}
     </table>
+</div>
 
     <nav class="list-pages">
         <ul>
@@ -30,7 +52,7 @@
 
             {%if page_obj.has_previous %}
 
-                <h5><a href="?page={{ page_obj.previous_page_number }}">&lt</a></h5>
+                <h5><a href="?page={{ page_obj.previous_page_number }}&filter={{selected_filter}}">&lt</a></h5>
 
             {% endif %}
 
@@ -39,23 +61,25 @@
                     <h5>{{ p }} из {{ page_obj.paginator.num_pages }}</h5>
                 {% elif p >= page_obj.number|add:-2 and p <= page_obj.number|add:2 %}
 
-                    <h5><a href="?page={{ p }}">{{ p }}</a></h5>
+                    <h5><a href="?page={{ p }}&filter={{selected_filter}}">{{ p }}</a></h5>
 
                 {% endif %}
             {% endfor %}
 
             {% if page_obj.has_next %}
 
-                <h5><a href="?page={{ page_obj.next_page_number }}">&gt</a></h5>
+                <h5><a href="?page={{ page_obj.next_page_number }}&filter={{selected_filter}}">&gt</a></h5>
 
             {% endif %}
             </div>
         </ul>
     </nav>
 
-    <table>
+
         {% if result != null %}
-            <tr><th>Исполнитель</th><th>Альбом</th><th>Песня</th><th>Создатель</th><th></th><th></th></tr>
+<div class="main_table">
+     <table>
+            <tr><th>Исполнитель</th><th>Альбом</th><th>Песня</th><th>Создатель</th><th>Лайки</th><th></th><th></th></tr>
 
             {% for r in result %}
             <tr>
@@ -63,6 +87,7 @@
                 <td>{{ r.song.album }}</td>
                 <td>{{ r.song }}</td>
                 <td>{{ r.creator }}</td>
+                <td>{{ r.likes }}</td>
                 <td><a href="/content/{{r.id}}">Просмотр</a></td>
                 {% if moder == True or r.creator == user%}
                     <td><a href="/change/{{r.id}}">Изменить</a></td>
@@ -71,10 +96,12 @@
             {% endfor %}
         {% endif %}
     </table>
+</div>
 
-    <table>
         {% if user_songs != null %}
-            <tr><th>Исполнитель</th><th>Альбом</th><th>Песня</th><th>Создатель</th><th></th><th></th></tr>
+<div class="main_table">
+    <table>
+            <tr><th>Исполнитель</th><th>Альбом</th><th>Песня</th><th>Создатель</th><th>Лайки</th><th></th><th></th></tr>
 
             {% for user_song in user_songs %}
             <tr>
@@ -82,6 +109,7 @@
                 <td>{{ user_song.song.album }}</td>
                 <td>{{ user_song.song }}</td>
                 <td>{{ user_song.creator }}</td>
+                <td>{{ user_song.likes }}</td>
                 <td><a href="/content/{{user_song.id}}">Просмотр</a></td>
 
                 <td><a href="/change/{{user_song.id}}">Изменить</a></td>
@@ -90,10 +118,12 @@
             {% endfor %}
         {% endif %}
     </table>
+</div>
 
-    <table>
         {% if user_favourites != null %}
-            <tr><th>Исполнитель</th><th>Альбом</th><th>Песня</th><th>Создатель</th><th></th><th></th></tr>
+<div class="main_table">
+    <table>
+            <tr><th>Исполнитель</th><th>Альбом</th><th>Песня</th><th>Создатель</th><th>Лайки</th><th></th><th></th></tr>
 
             {% for favourite in user_favourites %}
             <tr>
@@ -101,6 +131,7 @@
                 <td>{{ favourite.song.song.album }}</td>
                 <td>{{ favourite.song.song }}</td>
                 <td>{{ favourite.song.creator }}</td>
+                <td>{{ favourite.song.likes }}</td>
                 <td><a href="/content/{{favourite.song.id}}">Просмотр</a></td>
                 {% if moder == True  or favourite.song.creator == user %}
                     <td><a href="/change/{{favourite.song.id}}">Изменить</a></td>
@@ -111,5 +142,4 @@
         {% endif %}
     </table>
 </div>
-
 {% endblock %}

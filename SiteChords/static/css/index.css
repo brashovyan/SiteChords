@@ -18,6 +18,13 @@
 	border-bottom: 5px solid #F0FFFF;
 }
 
+label {
+    text-indent:10px;
+   font-family: Verdana;
+   font-size: 20px;
+   color: #151130;
+}
+
 h5 {
    text-indent:10px;
    font-family: Verdana;

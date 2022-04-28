@@ -36,6 +36,7 @@ class ContentWithChords(models.Model):
     creator = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Создатель', null=False)
     content = models.TextField(help_text='Введите содержание (текст песни с расставленными аккордами', verbose_name='Содержание', null=False)
     chords = models.ManyToManyField('Chord', help_text='Выберите какие аккорды есть в вашем содержании (например Am, C, F).', verbose_name='Аккорды')
+    likes = models.IntegerField(default=0, help_text="Введите кол-во лайков", verbose_name="Лайки")
     objects = models.Manager()
 
     def __str__(self):
@@ -65,4 +66,5 @@ class ChordVariation(models.Model):
 class Favourites(models.Model):
     guitarist = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Пользователь', null=False)
     song = models.ForeignKey(ContentWithChords, on_delete=models.CASCADE, verbose_name='Песня', null=False)
+    objects = models.Manager()
 

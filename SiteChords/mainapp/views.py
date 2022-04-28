@@ -8,19 +8,31 @@ from django.core.paginator import Paginator
 
 
 def index(request):
+    return HttpResponseRedirect('home?filter=new_old')
 
-    #songs = ContentWithChords.objects.all() #от старых к новым
-    songs = ContentWithChords.objects.all().order_by('-id') #от новых к старым
+
+def home(request):
+    selected_filter = request.GET.get('filter')
+
+    if selected_filter == None:
+        return HttpResponseRedirect("/")
+
+    if selected_filter == "new_old":  # от новых к старым
+        songs = ContentWithChords.objects.all().order_by('-id')
+    elif selected_filter == "old_new":  # от старых к новым
+        songs = ContentWithChords.objects.all()
+    else:  # по лайкам
+        songs = ContentWithChords.objects.all().order_by('-likes')
+
     paginator = Paginator(songs, 20) #мы говорим пагинатору: бери отсюда например по три штучки
-                                         #в результате чего он как бы разбивает нашу огромную кучу песен на маленькие кучки по три
+                                             #в результате чего он как бы разбивает нашу огромную кучу песен на маленькие кучки по три
     page_number = request.GET.get('page') #после чего получаем из url номер страницы (номера он тоже делает сам в зависимости от кол-ва кучек)
     page_obj = paginator.get_page(page_number) #и на основе номера страницы пагинатор решает какую именно кучку песен надо показать
-    #т.е. максимально простыми словами пагинтаор за нас автоматически разбивает огромную кучу на кучки поменьше и отдельно показывает их
+        #т.е. максимально простыми словами пагинтаор за нас автоматически разбивает огромную кучу на кучки поменьше и отдельно показывает их
 
     flag_moder = check_moder(request)
 
-    return render(request, 'mainapp/index.html', {"moder":flag_moder, 'page_obj': page_obj})
-
+    return render(request, 'mainapp/index.html', {"moder":flag_moder, 'page_obj': page_obj, 'selected_filter': selected_filter})
 
 def content(request, id):
     song = ContentWithChords.objects.get(id=id)
@@ -449,6 +461,9 @@ def my_songs(request, id):
 def search(request):
     ser = request.GET.get('search_str')
 
+    if ser == None:
+        return HttpResponseRedirect("/")
+
     result = []
 
     ser = ser.strip()
@@ -523,9 +538,13 @@ def favourites(request, id):
             fav.guitarist = user
             fav.song = song
             fav.save()
+            song.likes += 1
+            song.save()
             return HttpResponseRedirect(f"/content/{id}")
         else:
             Favourites.objects.get(guitarist=user, song=song).delete()
+            song.likes -= 1
+            song.save()
             return HttpResponseRedirect(f"/content/{id}")
     else:
         return HttpResponseRedirect("/")

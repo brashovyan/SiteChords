@@ -29,7 +29,7 @@ input {
                 {% endif %}
                 <li class="nav-item"><a href="/my_favourites/{{user.id}}" class="nav-link">Избранное</a></li>
                 <li class="nav-item"><a href="/my/{{user.id}}" class="nav-link">Мои песни</a></li>
-                <input name="search_str" type="text" placeholder="Поиск...">
+                <input name="search_str" type="search" placeholder="Поиск...">
             </ul>
             {% else %}
                 <input name="search_str" type="text" placeholder="Поиск...">

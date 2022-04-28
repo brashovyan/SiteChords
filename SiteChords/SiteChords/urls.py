@@ -20,7 +20,9 @@ from mainapp import views
 
 urlpatterns = [
     path('admindjango/', admin.site.urls),
-    path('', views.index, name='home'),
+    path('', views.index, name='index'),
+    path('home', views.home, name="home"),
+    path('home/<str:filter>/', views.home),
     path('content/<int:id>/', views.content, name='content'),
     path('create/', views.create, name="create"),
     path('register/', views.register, name='register'),
