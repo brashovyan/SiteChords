@@ -17,10 +17,17 @@ button {
    }
 
 h6 {
-   text-indent:10px;
+   text-indent:135px;
    font-family: Verdana;
    font-size: 15px;
    color: #FF0000;
+   }
+
+h5 {
+   text-indent:135px;
+   font-family: Verdana;
+   font-size: 15px;
+   color: #000000;
    }
 
 h3 {

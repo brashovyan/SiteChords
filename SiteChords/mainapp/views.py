@@ -40,6 +40,8 @@ def content(request, id):
     lines = []
     chords = []
 
+    lines_with_chords = []
+
     flag_favourite = False
 
     if request.user.is_authenticated:
@@ -52,12 +54,20 @@ def content(request, id):
             chords.append(cv)
 
     for line in s.split('\n'):
-        line = line.replace(" ", "&nbsp;") #для тупого html заменяем все пробелы на это
+        if '}' in line:
+            line = line.replace('}', '')
+            line = line.replace('{', '')
+            line = line.replace(" ", "&nbsp;")
+            lines_with_chords.append(line)
+        line = line.replace(" ", "&nbsp;")  # для тупого html заменяем все пробелы на это
         lines.append(line)
+
+
+
 
     flag_moder = check_moder(request)
 
-    return render(request, 'mainapp/content.html', {"song": song, "lines": lines, 'chords':chords, 'flag_favourite':flag_favourite, 'moder':flag_moder})
+    return render(request, 'mainapp/content.html', {"song": song, "lines": lines, 'c_variations':chords, 'flag_favourite':flag_favourite, 'moder':flag_moder, 'lines_with_chords':lines_with_chords})
 
 
 def create(request):
@@ -147,7 +157,7 @@ def create(request):
                             con2 = con.replace('}', '')
                             con2 = con2.split(' ')
                             for chord in con2:
-                                if chord != "":
+                                if chord != "" and chord!='\r' and chord!='\n':
                                     try:
                                         chord = chord.strip()
                                         chord2 = Chord.objects.get(title=chord)
@@ -174,7 +184,7 @@ def create(request):
                             con2 = con2.split(' ')
                             k = 0
                             for chord in con2:
-                                if chord != "":
+                                if chord != "" and chord!='\r' and chord!='\n':
                                     try:
                                         chord = chord.strip()
                                         chord2 = Chord.objects.get(title=chord)
@@ -367,28 +377,91 @@ def change(request, id):
                         Song.objects.create(title=song, album=Album.objects.get(singer=Singer.objects.get(name=singer), title=album))
 
                     song_content.song = Song.objects.get(album=Album.objects.get(singer=Singer.objects.get(name=singer), title=album), title=song)
-                    #song_content.creator = User.objects.get(username=request.user.username)
                     song_content.content = request.POST.get('content')
 
-                    chords = request.POST.get('chords')
-                    chords = chords.split(',')  # сплитим по запятым
-                    i = 0
-                    try:
-                        for chord in chords:
-                            chord = chord.strip()  # убираем лишние пробелы
-                            chord2 = Chord.objects.get(title=chord)
-                            i = i + 1
-                    except:
+                    content = request.POST.get('content')
+                    final_chords = []
+
+                    content = content.split('\n')
+                    for con in content:
+                        if '}' in con and '{' not in con:
+                            if con.count('}') == 1 and con.index('}') == 0:
+                                con2 = con.replace('}', '')
+                                con2 = con2.split(' ')
+                                for chord in con2:
+                                    if chord != "" and chord!='\r' and chord!='\n':
+                                        try:
+                                            chord = chord.strip()
+                                            chord2 = Chord.objects.get(title=chord)
+                                            if chord2 not in final_chords:
+                                                final_chords.append(chord2)
+                                        except:
+                                            flag_moder = check_moder(request)
+
+                                            error = f"При проверке аккордов произошла ошибка! Убедитесь, что они введены правильно. Строка с возможной ошибкой: {con}"
+                                            return render(request, 'mainapp/change.html',
+                                                          {"form": form, 'error': error, 'moder': flag_moder})
+                            else:
+                                flag_moder = check_moder(request)
+
+                                error = f"При проверке аккордов произошла ошибка! Убедитесь, что они введены правильно. Строка с возможной ошибкой: {con}"
+                                return render(request, 'mainapp/change.html',
+                                              {"form": form, 'error': error, 'moder': flag_moder})
+
+
+                        elif '{' in con and '}' in con and '{}' not in con:
+                            if con.count('{') == 1 and con.count('}') == 1 and (con.index('{') < con.index('}')):
+                                con2 = con[con.index('{') + 1:con.index('}')]
+                                con2 = con2.split(' ')
+                                k = 0
+                                for chord in con2:
+                                    if chord != "" and chord!='\r' and chord!='\n':
+                                        try:
+                                            chord = chord.strip()
+                                            chord2 = Chord.objects.get(title=chord)
+                                            if chord2 not in final_chords:
+                                                final_chords.append(chord2)
+                                        except:
+                                            flag_moder = check_moder(request)
+
+                                            error = f"При проверке аккордов произошла ошибка! Убедитесь, что они введены правильно. Строка с возможной ошибкой: {con}"
+                                            return render(request, 'mainapp/change.html',
+                                                          {"form": form, 'error': error, 'moder': flag_moder})
+                                    else:
+                                        k += 1
+
+                                if k == len(con2):
+                                    flag_moder = check_moder(request)
+
+                                    error = f"При проверке аккордов произошла ошибка! Убедитесь, что они введены правильно. Строка с возможной ошибкой: {con}"
+                                    return render(request, 'mainapp/change.html',
+                                                  {"form": form, 'error': error, 'moder': flag_moder})
+
+                            else:
+                                flag_moder = check_moder(request)
+
+                                error = f"При проверке аккордов произошла ошибка! Убедитесь, что они введены правильно. Строка с возможной ошибкой: {con}"
+                                return render(request, 'mainapp/change.html',
+                                              {"form": form, 'error': error, 'moder': flag_moder})
+
+
+                        elif not ('{' not in con and '}' not in con):
+                            flag_moder = check_moder(request)
+                            error = f"При проверке аккордов произошла ошибка! Убедитесь, что они введены правильно. Строка с возможной ошибкой: {con}"
+                            return render(request, 'mainapp/change.html',
+                                          {"form": form, 'error': error, 'moder': flag_moder})
+
+                    if not final_chords:
                         flag_moder = check_moder(request)
 
-                        error = "Вы неправильно ввели аккорды! Или, возможно, каких то аккордов нет в базе данных."
-                        return render(request, 'mainapp/change.html', {"form": form, 'error': error, 'moder':flag_moder})
+                        error = "Вы не указали аккорды! Прочитайте, пожалуйста, подсказку ниже."
+                        return render(request, 'mainapp/change.html',
+                                      {"form": form, 'error': error, 'moder': flag_moder})
 
-                    if i == len(chords):
+                    else:
                         song_content.chords.clear()
                         song_content.save()
-                        for chord in chords:
-                            chord = chord.strip()
+                        for chord in final_chords:
                             chord2 = Chord.objects.get(title=chord)
                             song_content.chords.add(chord2)
 
@@ -404,11 +477,6 @@ def change(request, id):
 
                         return HttpResponseRedirect("/")
 
-                    else:
-                        flag_moder = check_moder(request)
-
-                        error = "Некорректно заполненная форма!"
-                        return render(request, 'mainapp/change.html', {"form": form, 'error': error, 'moder':flag_moder})
                 else:
                     flag_moder = check_moder(request)
 
@@ -420,13 +488,8 @@ def change(request, id):
                 flag_moder = check_moder(request)
 
                 song = ContentWithChords.objects.get(id=id)
-                s = ""
 
-                for chord in song.chords.all():
-                    s = s + chord.title + ', '
-                s = s[0:-2]
-
-                form = CreateForm(initial={'singer': song.song.album.singer, 'album':song.song.album, 'song':song.song, 'content':song.content, 'chords':s})
+                form = CreateForm(initial={'singer': song.song.album.singer, 'album':song.song.album, 'song':song.song, 'content':song.content})
 
                 return render(request, 'mainapp/change.html', {"form": form, 'song': song, 'moder':flag_moder})
         else:

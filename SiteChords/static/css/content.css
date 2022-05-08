@@ -10,9 +10,14 @@ h3 {
    color: #151130;
    }
 
-h6 {
-   text-indent:10px;
-   font-family: Verdana;
+h4 {
+   font-size: 23px;
+   text-indent:15px;
+   color: #000080;
+   }
+
+h5 {
+   text-indent:15px;
    color: #000000;
    }
 

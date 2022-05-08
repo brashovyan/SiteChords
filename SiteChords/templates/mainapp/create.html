@@ -13,8 +13,23 @@
                 {{ form }}
             </table>
 
+        {% if error != Null %}
         <br>
-        <h6>{{ error }}</h6>
+            <h6>{{ error }}</h6>
+        {% endif %}
+        <br>
+
+            <h5><strong>Подсказка:</strong></h5>
+            <h5>Текст песни вставляется как он есть, но в начале строки с аккордами должен стоять символ "}" (закрывающая фигурная скобка).</h5>
+            <h5>Если аккорды стоят прямо в строке с текстом, то их нужно выделить символами "{" и "}" (открывающая и закрывающая фигурные скобки).</h5>
+        <br>
+            <h5><strong>Пример:</strong></h5>
+            <h5>}&nbsp;&nbsp;Am&nbsp;&nbsp;&nbsp;G&nbsp;&nbsp;F</h5>
+            <h5>Строка куплета песни</h5>
+        <br>
+            <h5>Припев : {&nbsp;Am&nbsp;Dm&nbsp;} 3 раза</h5>
+        <br>
+
         <div class="mx-auto col-lg-1">
             <button class="w-100 btn btn-lg btn-primary" type="submit">Создать</button>
         </div>
