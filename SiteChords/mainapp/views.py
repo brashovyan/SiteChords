@@ -157,7 +157,7 @@ def create(request):
                             con2 = con.replace('}', '')
                             con2 = con2.split(' ')
                             for chord in con2:
-                                if chord != "" and chord!='\r' and chord!='\n':
+                                if chord != "" and chord!='\r' and chord!='\n' and chord!='\t' and chord!='\b':
                                     try:
                                         chord = chord.strip()
                                         chord2 = Chord.objects.get(title=chord)
@@ -184,7 +184,7 @@ def create(request):
                             con2 = con2.split(' ')
                             k = 0
                             for chord in con2:
-                                if chord != "" and chord!='\r' and chord!='\n':
+                                if chord != "" and chord!='\r' and chord!='\n' and chord!='\t' and chord!='\b':
                                     try:
                                         chord = chord.strip()
                                         chord2 = Chord.objects.get(title=chord)
@@ -389,7 +389,7 @@ def change(request, id):
                                 con2 = con.replace('}', '')
                                 con2 = con2.split(' ')
                                 for chord in con2:
-                                    if chord != "" and chord!='\r' and chord!='\n':
+                                    if chord != "" and chord!='\r' and chord!='\n' and chord!='\t' and chord!='\b':
                                         try:
                                             chord = chord.strip()
                                             chord2 = Chord.objects.get(title=chord)
@@ -415,7 +415,7 @@ def change(request, id):
                                 con2 = con2.split(' ')
                                 k = 0
                                 for chord in con2:
-                                    if chord != "" and chord!='\r' and chord!='\n':
+                                    if chord != "" and chord!='\r' and chord!='\n' and chord!='\t' and chord!='\b':
                                         try:
                                             chord = chord.strip()
                                             chord2 = Chord.objects.get(title=chord)
