@@ -3,11 +3,12 @@
 {% block site_content %}
 {% load static %}
 <link href= '{% static "css/index.css" %}' rel="stylesheet" >
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
 
     {% if result == null and user_songs == null and user_favourites == null %}
      <form action="{% url 'home' %}" method="get">
          <label for="filter">Фильтр:</label>
-        <select name='filter' id="filter">
+        <select name='filter' id="filter" onchange="this.form.submit()">
             {% if selected_filter == 'new_old' %}
                 <option value='new_old' selected>От новых к старым</option>
                 <option value='old_new'>От старых к новым</option>
@@ -22,7 +23,7 @@
                 <option value='likes' selected>По лайкам</option>
             {% endif %}
         </select>
-         <button type="submit">Применить</button>
+<!--         <button type="submit">Применить</button>-->
     </form>
 
 <div class="main_table">
