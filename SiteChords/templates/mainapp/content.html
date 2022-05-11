@@ -2,6 +2,8 @@
 {% block title %}{{ song.song }}{% endblock %}
 {%block site_content %}
 {% load static %}
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script> <!-- Подключаем Vue (Еее, джава)-->
+
 <link href= '{% static "css/content.css" %}' rel="stylesheet" >
 
 <div class="block-left">
@@ -17,19 +19,40 @@
     <br>
     <br>
 
+<!--<div id="app">-->
+<!--    [[ Rework("{{lines}}") ]]-->
+<!--</div>-->
+    
+<!--    <script>
+     var app = new Vue({
+        el: '#app',
+        data: {
+        message: 'Hello Vue!'
+    },
+        delimiters: ['[[',']]']
+    })
+    </script>-->
+
+&nbsp;&nbsp;<button onclick="enLarge()">+</button>
+    &nbsp;&nbsp;<button onclick="enSmall()">-</button>
+    <br>
+    <br>
+
+    <div class="3 tabs__item active uiTabItem">
     {% for line in lines %}
         {% if line in lines_with_chords %}
-             <h4>{{ line|safe|linebreaks }}</h4>
+
+            <h4>{{ line|safe|linebreaks }}</h4>
+
         {% else %}
             <h5>{{ line|safe|linebreaks}}</h5>
         {% endif %}
     {% endfor %}
-
+        </div>
 </div>
 
 
 <div class="block-right">
-
     <h3>Аккорды из песни:</h3>
     {% for chord in song.chords.all %}
     <p style="font-size: 20px; text-indent:10px;">Аккорд <strong>{{ chord.title }}</strong>:</p>
@@ -46,8 +69,35 @@
     <br>
 
     {% endfor %}
-
-
-
 </div>
+
+<script>
+const text2 = document.querySelector(".tabs__item.active"); //получаем всё содержимое этого класса (почему название именное такое я не знаю)
+const text = text2.querySelectorAll("p"); // получаем всё содержимое тегов p
+
+function enLarge()
+{
+   for(var i = 0; i < text.length; ++i) // по циклу каждый тег p
+   {
+        const size = parseInt(window.getComputedStyle(text[i]).fontSize); // считываем текущий размер
+        //console.log(size)
+        text[i].style.fontSize = Math.min(100, size * 1.1) + "px"; // увеличиваем, умножая на 1.1, но не больше 100
+
+   }
+}
+
+function enSmall()
+{
+   for(var i = 0; i < text.length; ++i)
+   {
+        const size = parseInt(window.getComputedStyle(text[i]).fontSize);
+        //console.log(size)
+        if(size > 12) // после 12 какая то точка невозврата и увеличение не работает (т.е. размер не меньше 12)
+        {
+            text[i].style.fontSize = Math.min(100, size * 0.95) + "px";
+        }
+   }
+}
+</script>
+
 {% endblock %}

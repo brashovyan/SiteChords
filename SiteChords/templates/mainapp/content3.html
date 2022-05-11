@@ -1,0 +1,53 @@
+{% extends 'mainapp/base.html' %}
+{% block title %}{{ song.song }}{% endblock %}
+{%block site_content %}
+{% load static %}
+<link href= '{% static "css/content.css" %}' rel="stylesheet" >
+
+<div class="block-left">
+    <h1>{{ song.song.album.singer }} - {{ song.song }}</h1>
+    <h3>Создатель: {{ song.creator }}</h3>
+    {% if user.is_authenticated %}
+        {% if flag_favourite == False %}
+        <a href="/favourites/{{song.id}}">&nbsp;&nbsp;&nbsp;Добавить в избранное</a>
+        {% else %}
+        <a href="/favourites/{{song.id}}">&nbsp;&nbsp;&nbsp;Убрать из избранного</a>
+        {% endif %}
+    {% endif %}
+    <br>
+    <br>
+
+    {% for line in lines %}
+        {% if line in lines_with_chords %}
+             <h4>{{ line|safe|linebreaks }}</h4>
+        {% else %}
+            <h5>{{ line|safe|linebreaks}}</h5>
+        {% endif %}
+    {% endfor %}
+
+</div>
+
+
+<div class="block-right">
+
+    <h3>Аккорды из песни:</h3>
+    {% for chord in song.chords.all %}
+    <p style="font-size: 20px; text-indent:10px;">Аккорд <strong>{{ chord.title }}</strong>:</p>
+            {% for c_variation in c_variations %}
+                {% if chord == c_variation.chord %}
+                    {% if 'http' in c_variation.content %}
+                            &nbsp;&nbsp;<img src="{{ c_variation.content }}">
+                        {% else %}
+                            &nbsp;&nbsp;<img src="{% static c_variation.content %}">
+                        {% endif %}
+                {% endif %}
+            {% endfor %}
+    <br>
+    <br>
+
+    {% endfor %}
+
+
+
+</div>
+{% endblock %}
