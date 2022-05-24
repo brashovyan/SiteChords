@@ -2,11 +2,11 @@
 {% block title %}{{ song.song }}{% endblock %}
 {%block site_content %}
 {% load static %}
-<script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script> <!-- Подключаем Vue (Еее, джава)-->
+<!--<script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script> &lt;!&ndash; Подключаем Vue (Еее, джава)&ndash;&gt;-->
 
 <link href= '{% static "css/content.css" %}' rel="stylesheet" >
 
-<div class="block-left">
+<div class="block-left" id="block">
     <h1>{{ song.song.album.singer }} - {{ song.song }}</h1>
     <h3>Создатель: {{ song.creator }}</h3>
     {% if user.is_authenticated %}
@@ -33,8 +33,15 @@
     })
     </script>-->
 
-&nbsp;&nbsp;<button onclick="enLarge()">+</button>
-    &nbsp;&nbsp;<button onclick="enSmall()">-</button>
+&nbsp;&nbsp;<button onclick="enLarge()">Увеличить текст</button>
+    &nbsp;&nbsp;<button onclick="enSmall()">Уменьшить текст</button>
+    &nbsp;&nbsp;<button onclick="pageScroll()">Автопрокрутка</button>
+    <button onclick="pageScrollFast()">+</button>
+    <button onclick="pageScrollSlow()">-</button>
+    <button onclick="pageScrollStop()">Остановить</button>
+
+
+
     <br>
     <br>
 
@@ -51,7 +58,6 @@
         </div>
 </div>
 
-
 <div class="block-right">
     <h3>Аккорды из песни:</h3>
     {% for chord in song.chords.all %}
@@ -67,13 +73,15 @@
             {% endfor %}
     <br>
     <br>
-
     {% endfor %}
-</div>
 
+</div>
 <script>
 const text2 = document.querySelector(".tabs__item.active"); //получаем всё содержимое этого класса (почему название именное такое я не знаю)
 const text = text2.querySelectorAll("p"); // получаем всё содержимое тегов p
+var speed = 100
+scrolldelay = setTimeout(pageScroll, speed);
+clearTimeout(scrolldelay);
 
 function enLarge()
 {
@@ -98,6 +106,49 @@ function enSmall()
         }
    }
 }
-</script>
 
+function pageScrollFast()
+{
+    clearTimeout(scrolldelay);
+    if(speed > 10)
+    {
+        speed -= 15;
+    }
+    console.log(speed)
+    pageScroll();
+}
+
+function pageScrollSlow()
+{
+    clearTimeout(scrolldelay);
+    if(speed < 500)
+    {
+        speed += 15;
+    }
+    console.log(speed)
+    pageScroll();
+}
+
+function pageScrollStop()
+{
+    clearTimeout(scrolldelay);
+}
+
+function pageScroll()
+{
+    clearTimeout(scrolldelay);
+    document.getElementById("block").scrollBy(0, 1);
+    scrolldelay = setTimeout(pageScroll, speed);
+}
+</script>
+<div class="block-footer">
 {% endblock %}
+</div>
+
+
+
+
+
+
+
+
