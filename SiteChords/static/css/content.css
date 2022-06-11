@@ -21,8 +21,20 @@ h5 {
    color: #000000;
    }
 
-.block-left{width:70%;height:800px;overflow:auto;float:left;}
-.block-right{width:30%;height:800px;overflow:auto;}
+.block-left
+{
+    width:70%;
+    height:600px;
+    overflow:auto;
+    float:left;
+}
+
+.block-right
+{
+    width:30%;
+    height:600px;
+    overflow:auto;
+}
 
 img {
     height: 100px;

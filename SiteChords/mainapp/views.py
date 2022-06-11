@@ -11,7 +11,7 @@ def index(request):
     return HttpResponseRedirect('home?filter=new_old')
 
 
-def home(request):
+def home(request): # домашняя страница
     selected_filter = request.GET.get('filter')
 
     if selected_filter == None:
@@ -34,7 +34,7 @@ def home(request):
 
     return render(request, 'mainapp/index.html', {"moder":flag_moder, 'page_obj': page_obj, 'selected_filter': selected_filter})
 
-def content(request, id):
+def content(request, id): #содержание песни
     song = ContentWithChords.objects.get(id=id)
     s = song.content
     lines = []
@@ -70,7 +70,7 @@ def content(request, id):
     return render(request, 'mainapp/content.html', {"song": song, "lines": lines, 'c_variations':chords, 'flag_favourite':flag_favourite, 'moder':flag_moder, 'lines_with_chords':lines_with_chords})
 
 
-def create(request):
+def create(request): #создание новой песни
     if request.user.is_authenticated:
         if request.method == "POST":
             form = CreateForm(request.POST)
@@ -92,13 +92,6 @@ def create(request):
                         break
 
                 if flag_singer == False:
-                    for singer2 in singer_db:
-                        if singer in singer2.name:
-                            singer = singer2
-                            flag_singer = True
-                            break
-
-                if flag_singer == False:
                     Singer.objects.create(name=singer)
 
                 album = request.POST.get('album')
@@ -111,13 +104,6 @@ def create(request):
                         album = album2.title
                         flag_album = True
                         break
-
-                if flag_album == False:
-                    for album2 in album_db:
-                        if album in album2.title:
-                            album = album2.title
-                            flag_album = True
-                            break
 
                 if flag_album == False:
                     Album.objects.create(title=album, singer=Singer.objects.get(name=singer))
@@ -134,19 +120,13 @@ def create(request):
                         break
 
                 if flag_song == False:
-                    for song2 in song_db:
-                        if song in song2.title:
-                            song = song2.title
-                            flag_song = True
-                            break
-
-                if flag_song == False:
                     Song.objects.create(title=song, album=Album.objects.get(singer=Singer.objects.get(name=singer), title=album))
 
                 song_content.song = Song.objects.get(album=Album.objects.get(singer=Singer.objects.get(name=singer), title=album), title=song)
                 song_content.creator = User.objects.get(username=request.user.username)
                 song_content.content = request.POST.get('content')
 
+                # дальше начинается парсинг аккордов
                 content = request.POST.get('content')
                 final_chords = []
 
@@ -258,7 +238,7 @@ def create(request):
         return HttpResponseRedirect("/login")
 
 
-def register(request):
+def register(request): # регистрация
     if request.method == "POST":
         form = RegForm(request.POST)
         if form.is_valid():
@@ -294,10 +274,8 @@ def register(request):
         return render(request, 'mainapp/register.html', {'form': form})
 
 
-def login1(request):
+def login1(request): #авторизация
     if request.method == "POST":
-        #form = LoginForm(request.POST)
-
         username = request.POST.get('username')
         password = request.POST.get('password')
         user = authenticate(request, username=username, password=password)
@@ -311,11 +289,10 @@ def login1(request):
     else:
         if request.user.is_authenticated:
             logout(request)
-        #form = LoginForm()
         return render(request, 'mainapp/login.html')
 
 
-def logout1(request):
+def logout1(request): #выход из учетной записи
     if request.user.is_authenticated:
         logout(request)
         return HttpResponseRedirect("/")
@@ -323,14 +300,14 @@ def logout1(request):
         return HttpResponseRedirect("/")
 
 
-def about(request):
-    return HttpResponseRedirect('https://www.youtube.com/watch?v=dQw4w9WgXcQ')
-    #flag_moder = check_moder(request)
+def about(request): #о сайте
+    #return HttpResponseRedirect('https://www.youtube.com/watch?v=dQw4w9WgXcQ')
+    flag_moder = check_moder(request)
 
-    #return render(request, 'mainapp/about.html', {'moder':flag_moder})
+    return render(request, 'mainapp/about.html', {'moder':flag_moder})
 
 
-def change(request, id):
+def change(request, id): #изменение песни
     if request.user.is_authenticated:
         if User.objects.filter(pk=request.user.id, groups__name='Moderator').exists() or ContentWithChords.objects.filter(id=id, creator=request.user).exists() or User.objects.filter(pk=request.user.id, groups__name='Admin').exists():
             if request.method == "POST":
@@ -387,6 +364,7 @@ def change(request, id):
                     song_content.song = Song.objects.get(album=Album.objects.get(singer=Singer.objects.get(name=singer), title=album), title=song)
                     song_content.content = request.POST.get('content')
 
+                        #дальше начинается парсинг аккордов
                     content = request.POST.get('content')
                     final_chords = []
 
@@ -514,7 +492,7 @@ def change(request, id):
         return HttpResponseRedirect("/")
 
 
-def delete(request, id):
+def delete(request, id): #удаление песни
     if request.user.is_authenticated:
         if User.objects.filter(pk=request.user.id, groups__name='Moderator').exists() or ContentWithChords.objects.filter(id=id, creator=request.user).exists() or User.objects.filter(pk=request.user.id, groups__name='Admin').exists():
             cwc = ContentWithChords.objects.get(id=id)
@@ -545,7 +523,7 @@ def delete(request, id):
         return HttpResponseRedirect("/")
 
 
-def profile(request, id):
+def profile(request, id): #профиль пользователя
     user = User.objects.get(id=id)
     if user == request.user or User.objects.filter(pk=request.user.id, groups__name='Admin').exists():
         if request.method == 'POST':
@@ -591,7 +569,7 @@ def profile(request, id):
         return HttpResponseRedirect("/")
 
 
-def my_songs(request, id):
+def my_songs(request, id): #список песен, созданных пользователем
     if request.user.is_authenticated:
 
         user = User.objects.get(id=id)
@@ -605,7 +583,7 @@ def my_songs(request, id):
         return HttpResponseRedirect("/")
 
 
-def search(request):
+def search(request): # поиск песен
     ser = request.GET.get('search_str')
 
     if ser == None:
@@ -676,7 +654,7 @@ def search(request):
     flag_moder = check_moder(request)
     return render(request, 'mainapp/index.html', {"moder": flag_moder, 'result': result})
 
-def favourites(request, id):
+def favourites(request, id): # добавление песни в избранное
     if request.user.is_authenticated:
         fav = Favourites()
         user = User.objects.get(id=request.user.id)
@@ -697,7 +675,7 @@ def favourites(request, id):
         return HttpResponseRedirect("/")
 
 
-def my_favourites(request, id):
+def my_favourites(request, id): # список избранного
     if request.user.is_authenticated:
         user = User.objects.get(id=id)
         if user == request.user:
@@ -710,7 +688,7 @@ def my_favourites(request, id):
         return HttpResponseRedirect("/")
 
 
-def admin(request):
+def admin(request): # панель администратора
     if User.objects.filter(pk=request.user.id, groups__name='Moderator').exists() or User.objects.filter(pk=request.user.id, groups__name='Admin').exists():
         flag_moder = True
         if User.objects.filter(pk=request.user.id, groups__name='Admin').exists():
@@ -723,7 +701,7 @@ def admin(request):
         return HttpResponseRedirect("/")
 
 
-def admin_users(request):
+def admin_users(request): # список пользователей
     if User.objects.filter(pk=request.user.id, groups__name='Admin').exists():
         users = User.objects.all()
         users_in_group = Group.objects.get(name="Moderator").user_set.all()
@@ -748,7 +726,7 @@ def admin_users(request):
         return HttpResponseRedirect("/")
 
 
-def admin_users_delete(request, id):
+def admin_users_delete(request, id): #удаление пользователя
     if User.objects.filter(pk=request.user.id, groups__name='Admin').exists():
         user = User.objects.get(id=id)
         if user.id != 1: #главный админ с айдишником 1 не может быть удалён
@@ -758,7 +736,7 @@ def admin_users_delete(request, id):
         return HttpResponseRedirect("/")
 
 
-def admin_users_deletemoder(request, id):
+def admin_users_deletemoder(request, id): #удаление роли модератора
     if User.objects.filter(pk=request.user.id, groups__name='Admin').exists():
         user = User.objects.get(id=id)
         group = Group.objects.get(name='Moderator')
@@ -768,7 +746,7 @@ def admin_users_deletemoder(request, id):
         return HttpResponseRedirect("/")
 
 
-def admin_users_givemoder(request, id):
+def admin_users_givemoder(request, id): #добавление роли модератора
     if User.objects.filter(pk=request.user.id, groups__name='Admin').exists():
         user = User.objects.get(id=id)
         group = Group.objects.get(name='Moderator')
@@ -778,7 +756,7 @@ def admin_users_givemoder(request, id):
         return HttpResponseRedirect("/")
 
 
-def admin_users_moderlist(request):
+def admin_users_moderlist(request): #список модераторов
     if User.objects.filter(pk=request.user.id, groups__name='Admin').exists():
         flag_moder = check_moder(request)
         hide_search = True
@@ -788,7 +766,7 @@ def admin_users_moderlist(request):
         return HttpResponseRedirect("/")
 
 
-def admin_singers(request):
+def admin_singers(request): #исполнители
     if User.objects.filter(pk=request.user.id, groups__name='Moderator').exists() or User.objects.filter(pk=request.user.id, groups__name='Admin').exists():
         flag_moder = True
         singers = Singer.objects.all()
@@ -810,7 +788,7 @@ def admin_singers(request):
         return HttpResponseRedirect("/")
 
 
-def admin_singers_change(request, id):
+def admin_singers_change(request, id): #изменение исполнителя
     if User.objects.filter(pk=request.user.id, groups__name='Moderator').exists() or User.objects.filter(pk=request.user.id, groups__name='Admin').exists():
         flag_moder = True
         singer = Singer.objects.get(id=id)
@@ -835,7 +813,7 @@ def admin_singers_change(request, id):
         return HttpResponseRedirect("/")
 
 
-def admin_singers_delete(request, id):
+def admin_singers_delete(request, id): #удаление исполнителя
     if User.objects.filter(pk=request.user.id, groups__name='Moderator').exists() or User.objects.filter(pk=request.user.id, groups__name='Admin').exists():
         singer = Singer.objects.get(id=id)
         singer.delete()
@@ -844,7 +822,7 @@ def admin_singers_delete(request, id):
         return HttpResponseRedirect("/")
 
 
-def admin_singers_create(request):
+def admin_singers_create(request): #создание исполнителя
     if User.objects.filter(pk=request.user.id, groups__name='Moderator').exists() or User.objects.filter(pk=request.user.id, groups__name='Admin').exists():
         flag_moder = True
         if request.method == 'POST':
@@ -864,7 +842,7 @@ def admin_singers_create(request):
         return HttpResponseRedirect("/")
 
 
-def admin_albums(request):
+def admin_albums(request): #альбомы
     if User.objects.filter(pk=request.user.id, groups__name='Moderator').exists() or User.objects.filter(pk=request.user.id, groups__name='Admin').exists():
         flag_moder = True
         albums = Album.objects.all()
@@ -885,7 +863,7 @@ def admin_albums(request):
         return HttpResponseRedirect("/")
 
 
-def admin_albums_change(request, id):
+def admin_albums_change(request, id): #изменение альбома
     if User.objects.filter(pk=request.user.id, groups__name='Moderator').exists() or User.objects.filter(pk=request.user.id, groups__name='Admin').exists():
         flag_moder = True
         album = Album.objects.get(id=id)
@@ -915,7 +893,7 @@ def admin_albums_change(request, id):
         return HttpResponseRedirect("/")
 
 
-def admin_albums_delete(request, id):
+def admin_albums_delete(request, id): #удаление альбома
     if User.objects.filter(pk=request.user.id, groups__name='Moderator').exists() or User.objects.filter(pk=request.user.id, groups__name='Admin').exists():
         album = Album.objects.get(id=id)
         album.delete()
@@ -924,7 +902,7 @@ def admin_albums_delete(request, id):
         return HttpResponseRedirect("/")
 
 
-def admin_albums_create(request):
+def admin_albums_create(request): #создание альбома
     if User.objects.filter(pk=request.user.id, groups__name='Moderator').exists() or User.objects.filter(pk=request.user.id, groups__name='Admin').exists():
         flag_moder = True
         singers = Singer.objects.all()
@@ -946,7 +924,7 @@ def admin_albums_create(request):
         return HttpResponseRedirect("/")
 
 
-def admin_songs(request):
+def admin_songs(request): #песни
     if User.objects.filter(pk=request.user.id, groups__name='Moderator').exists() or User.objects.filter(pk=request.user.id, groups__name='Admin').exists():
         flag_moder = True
         songs = Song.objects.all()
@@ -967,7 +945,7 @@ def admin_songs(request):
         return HttpResponseRedirect("/")
 
 
-def admin_songs_change(request, id):
+def admin_songs_change(request, id): #изменение песни
     if User.objects.filter(pk=request.user.id, groups__name='Moderator').exists() or User.objects.filter(pk=request.user.id, groups__name='Admin').exists():
         flag_moder = True
         song = Song.objects.get(id=id)
@@ -998,7 +976,7 @@ def admin_songs_change(request, id):
         return HttpResponseRedirect("/")
 
 
-def admin_songs_delete(request, id):
+def admin_songs_delete(request, id): #удаление песни
     if User.objects.filter(pk=request.user.id, groups__name='Moderator').exists() or User.objects.filter(pk=request.user.id, groups__name='Admin').exists():
         song = Song.objects.get(id=id)
         song.delete()
@@ -1007,7 +985,7 @@ def admin_songs_delete(request, id):
         return HttpResponseRedirect("/")
 
 
-def admin_songs_create(request):
+def admin_songs_create(request): #создание песни
     if User.objects.filter(pk=request.user.id, groups__name='Moderator').exists() or User.objects.filter(pk=request.user.id, groups__name='Admin').exists():
         flag_moder = True
         albums = Album.objects.all()
@@ -1029,7 +1007,7 @@ def admin_songs_create(request):
         return HttpResponseRedirect("/")
 
 
-def check_moder(request):
+def check_moder(request): #проверка роли пользователя
     flag_moder = False
     if User.objects.filter(pk=request.user.id, groups__name='Moderator').exists() or User.objects.filter(pk=request.user.id, groups__name='Admin').exists():
         flag_moder = True
@@ -1037,7 +1015,7 @@ def check_moder(request):
     return flag_moder
 
 
-def admin_chords(request):
+def admin_chords(request): #аккорды
     if User.objects.filter(pk=request.user.id, groups__name='Moderator').exists() or User.objects.filter(pk=request.user.id, groups__name='Admin').exists():
         flag_moder = True
         chords = Chord.objects.all()
@@ -1057,7 +1035,7 @@ def admin_chords(request):
         return HttpResponseRedirect("/")
 
 
-def admin_chords_change(request, id):
+def admin_chords_change(request, id): #изменение аккорда
     if User.objects.filter(pk=request.user.id, groups__name='Moderator').exists() or User.objects.filter(pk=request.user.id, groups__name='Admin').exists():
         flag_moder = True
         chord = Chord.objects.get(id=id)
@@ -1080,7 +1058,7 @@ def admin_chords_change(request, id):
         return HttpResponseRedirect("/")
 
 
-def admin_chords_delete(request, id):
+def admin_chords_delete(request, id): #удаление аккорда
     if User.objects.filter(pk=request.user.id, groups__name='Moderator').exists() or User.objects.filter(pk=request.user.id, groups__name='Admin').exists():
         chord = Chord.objects.get(id=id)
         chord.delete()
@@ -1089,7 +1067,7 @@ def admin_chords_delete(request, id):
         return HttpResponseRedirect("/")
 
 
-def admin_chords_create(request):
+def admin_chords_create(request): #создание аккорда
     if User.objects.filter(pk=request.user.id, groups__name='Moderator').exists() or User.objects.filter(pk=request.user.id, groups__name='Admin').exists():
         flag_moder = True
         if request.method == 'POST':
@@ -1108,7 +1086,7 @@ def admin_chords_create(request):
         return HttpResponseRedirect("/")
 
 
-def admin_chordvars(request):
+def admin_chordvars(request): #вариации аккордов
     if User.objects.filter(pk=request.user.id, groups__name='Moderator').exists() or User.objects.filter(pk=request.user.id, groups__name='Admin').exists():
         flag_moder = True
         chordvars = ChordVariation.objects.all()
@@ -1128,7 +1106,7 @@ def admin_chordvars(request):
         return HttpResponseRedirect("/")
 
 
-def admin_chordvars_change(request, id):
+def admin_chordvars_change(request, id): #изменение вариации аккорда
     if User.objects.filter(pk=request.user.id, groups__name='Moderator').exists() or User.objects.filter(pk=request.user.id, groups__name='Admin').exists():
         flag_moder = True
         chordvar = ChordVariation.objects.get(id=id)
@@ -1153,7 +1131,7 @@ def admin_chordvars_change(request, id):
     else:
         return HttpResponseRedirect("/")
 
-def admin_chordvars_delete(request, id):
+def admin_chordvars_delete(request, id): #удаление вариации аккорда
     if User.objects.filter(pk=request.user.id, groups__name='Moderator').exists() or User.objects.filter(pk=request.user.id, groups__name='Admin').exists():
         chordvar = ChordVariation.objects.get(id=id)
         chordvar.delete()
@@ -1162,7 +1140,7 @@ def admin_chordvars_delete(request, id):
         return HttpResponseRedirect("/")
 
 
-def admin_chordvars_create(request):
+def admin_chordvars_create(request): #создание вариации аккорда
     if User.objects.filter(pk=request.user.id, groups__name='Moderator').exists() or User.objects.filter(pk=request.user.id, groups__name='Admin').exists():
         flag_moder = True
         chords = Chord.objects.all()

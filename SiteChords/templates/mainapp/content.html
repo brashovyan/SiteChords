@@ -2,7 +2,6 @@
 {% block title %}{{ song.song }}{% endblock %}
 {%block site_content %}
 {% load static %}
-<!--<script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script> &lt;!&ndash; Подключаем Vue (Еее, джава)&ndash;&gt;-->
 
 <link href= '{% static "css/content.css" %}' rel="stylesheet" >
 
@@ -18,20 +17,6 @@
     {% endif %}
     <br>
     <br>
-
-<!--<div id="app">-->
-<!--    [[ Rework("{{lines}}") ]]-->
-<!--</div>-->
-    
-<!--    <script>
-     var app = new Vue({
-        el: '#app',
-        data: {
-        message: 'Hello Vue!'
-    },
-        delimiters: ['[[',']]']
-    })
-    </script>-->
 
 &nbsp;&nbsp;<button onclick="enLarge()">Увеличить текст</button>
     &nbsp;&nbsp;<button onclick="enSmall()">Уменьшить текст</button>
@@ -77,7 +62,7 @@
 
 </div>
 <script>
-const text2 = document.querySelector(".tabs__item.active"); //получаем всё содержимое этого класса (почему название именное такое я не знаю)
+const text2 = document.querySelector(".tabs__item.active"); //получаем всё содержимое этого класса
 const text = text2.querySelectorAll("p"); // получаем всё содержимое тегов p
 var speed = 100
 scrolldelay = setTimeout(pageScroll, speed);
@@ -114,7 +99,7 @@ function pageScrollFast()
     {
         speed -= 15;
     }
-    console.log(speed)
+    //console.log(speed)
     pageScroll();
 }
 
@@ -125,7 +110,7 @@ function pageScrollSlow()
     {
         speed += 15;
     }
-    console.log(speed)
+    //console.log(speed)
     pageScroll();
 }
 

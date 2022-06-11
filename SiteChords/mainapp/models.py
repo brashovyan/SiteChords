@@ -5,7 +5,6 @@ from django.contrib.auth.models import User
 
 class Singer(models.Model):
     name = models.CharField(max_length=250, help_text='Введите название исполнителя', verbose_name='Исполнитель', null=False)
-    #sostav = models.TextField(help_text='Введите состав группы (при наличии)', verbose_name='Состав группы', blank=True, null=True)
     objects = models.Manager() #служебное поле для доступа к объектам в базе данных
 
     def __str__(self):
@@ -15,7 +14,6 @@ class Singer(models.Model):
 class Album(models.Model):
     title = models.CharField(max_length=250, help_text='Введите название альбома', verbose_name="Название альбома", null=False)
     singer = models.ForeignKey('Singer', on_delete=models.CASCADE, help_text='Выберите исполнителя', verbose_name='Исполнитель', null=False)
-    #year = models.IntegerField(help_text='Введите год выпуска альбома', verbose_name='Год выпуска альбома', blank=True, null=True)
     objects = models.Manager()
 
     def __str__(self):
@@ -41,9 +39,6 @@ class ContentWithChords(models.Model):
 
     def __str__(self):
         return '%s: %s' % (self.song, self.creator)
-
-    """def get_absolute_url(self):
-        return reverse('content', args[str(self.id)])"""
 
 
 class Chord(models.Model):
