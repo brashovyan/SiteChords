@@ -24,7 +24,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = ''
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False # крч с фолсом это криво работает на локолаке. Слетают стили css и весь static. Это решается непосредственно при самом деплоинге
+# либо при запуске прописать runserver --insecure. Ну можно ещё потанцевать с бубном, при помощи каких то библиотек собирать статик и т.п.
 
 ALLOWED_HOSTS = ['*']
 
